@@ -1,4 +1,4 @@
-package com.digzdigital.cumessenger.model;
+package com.digzdigital.cumessenger.data.model;
 
 import java.util.ArrayList;
 import java.util.Date;

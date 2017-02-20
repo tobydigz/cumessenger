@@ -1,4 +1,4 @@
-package com.digzdigital.cumessenger.model;
+package com.digzdigital.cumessenger.data.model;
 
 /**
  * Created by Digz on 20/02/2017.
