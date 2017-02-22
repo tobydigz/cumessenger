@@ -1,8 +1,11 @@
 package com.digzdigital.cumessenger;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -13,8 +16,36 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.digzdigital.cumessenger.data.model.User;
+import com.digzdigital.cumessenger.fragment.EditFragment;
+import com.digzdigital.cumessenger.fragment.ProfileFragment;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuth.AuthStateListener;
+import com.google.firebase.auth.FirebaseUser;
+
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, ProfileFragment.ProfileFragmentListener, EditFragment.EditFragmentListener {
+
+    private FirebaseAuth auth;
+    private FirebaseUser firebaseUser;
+    private Fragment profileFragment, editFragment;
+    private FragmentManager fragmentManager;
+    private AuthStateListener listener = new AuthStateListener(){
+
+        @Override
+        public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+            FirebaseUser user = firebaseAuth.getCurrentUser();
+            if (user!=null){
+                //Nigga signed in
+            }else {
+                //Nigga signed out
+            }
+
+        }
+    };
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +71,7 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        auth = FirebaseAuth.getInstance();
     }
 
     @Override
@@ -97,5 +129,44 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onStart(){
+        super.onStart();
+        auth.addAuthStateListener(listener);
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+        auth.removeAuthStateListener(listener);
+    }
+
+    @Override
+    public void onEditClicked(User user) {
+        switchFragment(createEditFragment(user));
+    }
+
+    private void switchFragment(Fragment fragment){
+        fragmentManager.beginTransaction()
+                .replace(R.id.content_main, fragment)
+                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    private Fragment createEditFragment(User user){
+        return EditFragment.newInstance(user);
+    }
+
+    private Fragment getProfileFragment(){
+        if (profileFragment == null) profileFragment = new ProfileFragment();
+        return profileFragment;
+    }
+
+    @Override
+    public void onSaveChanges() {
+        switchFragment(getProfileFragment());
     }
 }

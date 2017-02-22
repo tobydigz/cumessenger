@@ -11,38 +11,31 @@ import android.view.ViewGroup;
 
 import com.digzdigital.cumessenger.R;
 import com.digzdigital.cumessenger.data.model.User;
-import com.digzdigital.cumessenger.databinding.FragmentProfileBinding;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
+import com.digzdigital.cumessenger.databinding.FragmentEditBinding;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * Use the {@link ProfileFragment#newInstance} factory method to
+ * {@link EditFragment.EditFragmentListener} interface
+ * to handle interaction events.
+ * Use the {@link EditFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ProfileFragment extends Fragment implements View.OnClickListener{
+public class EditFragment extends Fragment implements View.OnClickListener{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
+private DatabaseReference databaseReference;
+    private FragmentEditBinding binding;
     // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-    private FirebaseAuth auth;
-    private DatabaseReference databaseReference;
-    private FragmentProfileBinding binding;
-    private String schoolID;
-    private User user;
-    private ProfileFragmentListener listener;
+    private User user = null;
 
+    private EditFragmentListener listener;
 
-    public ProfileFragment() {
+    public EditFragment() {
         // Required empty public constructor
     }
 
@@ -50,16 +43,14 @@ public class ProfileFragment extends Fragment implements View.OnClickListener{
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ProfileFragment.
+     * @param user Parameter 1.
+     * @return A new instance of fragment BlankFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ProfileFragment newInstance(String param1, String param2) {
-        ProfileFragment fragment = new ProfileFragment();
+    public static EditFragment newInstance(User user) {
+        EditFragment fragment = new EditFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putParcelable(ARG_PARAM1, user);
         fragment.setArguments(args);
         return fragment;
     }
@@ -68,8 +59,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            user = getArguments().getParcelable(ARG_PARAM1);
         }
     }
 
@@ -77,29 +67,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_profile, container, false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_edit, container, false);
+        databaseReference = FirebaseDatabase.getInstance().getReference().child("users");
+        if (user != null) updateUI();
         return binding.getRoot();
-    }
-
-    @Override
-    public void onStart(){
-        super.onStart();
-        databaseReference = FirebaseDatabase.getInstance().getReference();
-    }
-
-    private void loadUser(){
-        databaseReference.child(schoolID).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                user = dataSnapshot.getValue(User.class);
-                updateUI();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
     }
 
     private void updateUI() {
@@ -113,13 +84,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener{
         binding.userPhone.setText(user.getPhoneNumber());
     }
 
-
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof ProfileFragmentListener) {
-            listener = (ProfileFragmentListener) context;
+        if (context instanceof EditFragmentListener) {
+            listener = (EditFragmentListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -134,7 +103,24 @@ public class ProfileFragment extends Fragment implements View.OnClickListener{
 
     @Override
     public void onClick(View v) {
-        listener.onEditClicked(user);
+        writeToDb();
+    }
+
+    private void writeToDb() {
+        if (user == null) user = new User();
+        user.setFirstName("");
+        user.setLastName("");
+        user.setMiddleName("");
+        user.setDepartment("");
+        user.setProgramme("");
+        user.setDateOfBirth("");
+        user.setStatus("");
+        user.setGraduationYear(2018);
+        user.setPhoneNumber("");
+        user.setEmail("");
+        user.setId("");
+        databaseReference.child(user.getId()).setValue(user);
+        listener.onSaveChanges();
     }
 
     /**
@@ -147,8 +133,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener{
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface ProfileFragmentListener {
+    public interface EditFragmentListener {
         // TODO: Update argument type and name
-        void onEditClicked(User user);
+        void onSaveChanges();
     }
 }
