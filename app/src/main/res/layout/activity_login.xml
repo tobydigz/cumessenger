@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools">
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <android.support.design.widget.CoordinatorLayout
+    <LinearLayout
         android:id="@+id/activity_login"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
+        android:orientation="vertical"
         tools:context="com.digzdigital.audyo.LoginActivity">
 
         <LinearLayout
@@ -18,9 +21,12 @@
             android:padding="@dimen/activity_horizontal_margin">
 
 
-            <android.support.design.widget.TextInputLayout
+            <com.github.florent37.materialtextfield.MaterialTextField
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:mtf_animationDuration="1000"
+                app:mtf_cardCollapsedHeight="4dp"
+                app:mtf_image="@drawable/ic_book_black_24dp">
 
                 <EditText
                     android:id="@+id/email"
@@ -31,11 +37,14 @@
                     android:inputType="textEmailAddress"
                     android:textColor="@android:color/white"
                     android:textColorHint="@android:color/white" />
-            </android.support.design.widget.TextInputLayout>
+            </com.github.florent37.materialtextfield.MaterialTextField>
 
-            <android.support.design.widget.TextInputLayout
+            <com.github.florent37.materialtextfield.MaterialTextField
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:mtf_animationDuration="1000"
+                app:mtf_cardCollapsedHeight="4dp"
+                app:mtf_image="@drawable/ic_book_black_24dp">
 
                 <EditText
                     android:id="@+id/password"
@@ -46,7 +55,7 @@
                     android:inputType="textPassword"
                     android:textColor="@android:color/white"
                     android:textColorHint="@android:color/white" />
-            </android.support.design.widget.TextInputLayout>
+            </com.github.florent37.materialtextfield.MaterialTextField>
 
             <!-- Login Button -->
 
@@ -90,5 +99,5 @@
             android:layout_gravity="center|bottom"
             android:layout_marginBottom="20dp"
             android:visibility="gone" />
-    </android.support.design.widget.CoordinatorLayout>
+    </LinearLayout>
 </layout>

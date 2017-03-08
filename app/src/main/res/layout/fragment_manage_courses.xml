@@ -1,0 +1,31 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+   <!-- <FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="150dp"
+    android:background="@color/colorAccent">
+    <fr.ganfra.materialspinner.MaterialSpinner
+        android:id="@+id/daySelect"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:paddingBottom="8dp"
+        app:ms_alignLabels="false"
+        app:ms_baseColor="@color/white"
+        app:ms_arrowSize="16dp"
+        app:ms_floatingLabelText="Day"
+        app:ms_hint="Day"
+        app:ms_multiline="false"
+        app:ms_thickness="2dp"/>
+</FrameLayout>-->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/courseRv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+</LinearLayout>

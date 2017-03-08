@@ -38,9 +38,21 @@ dependencies {
     compile "com.google.firebase:firebase-crash:$rootProject.ext.firebaseVersion"
     testCompile "junit:junit:$rootProject.ext.junitVersion"
     compile "com.android.support:support-v4:$rootProject.ext.supportLibraryVersion"
-
+    compile('com.github.ganfra:material-spinner:1.1.0') {
+        exclude group: 'com.android.support', module: 'appcompat-v7'
+    }
+    compile 'org.greenrobot:eventbus:3.0.0'
+    compile 'de.codecrafters.tableview:tableview:2.5.0'
     compile 'com.mikhaellopez:circularimageview:3.0.2'
     compile 'com.android.support:support-v4:25.1.1'
+    compile 'com.wdullaer:materialdatetimepicker:1.5.1'
+    compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
+    compile 'com.github.florent37:materialtextfield:1.0.7'
+    compile 'com.tonicartos:superslim:0.4.13'
+    compile 'com.google.dagger:dagger:2.8'
+    compile 'org.zakariya.stickyheaders:stickyheaders:0.7.6'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.8'
+    provided 'javax.annotation:jsr250-api:1.0'
 }
 
 
@@ -51,3 +63,6 @@ dependencies {
 
 
 apply plugin: 'com.google.gms.google-services'
+repositories {
+    mavenCentral()
+}
