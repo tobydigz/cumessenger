@@ -1,24 +1,25 @@
-package com.digzdigital.cumessenger.fragment.manageCourse;
+package com.digzdigital.cumessenger.fragment.forum.forumMessages;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-
 import com.digzdigital.cumessenger.R;
 import com.digzdigital.cumessenger.data.DataManager;
-import com.digzdigital.cumessenger.data.db.model.Course;
+import com.digzdigital.cumessenger.data.messenger.model.Forum;
+import com.digzdigital.cumessenger.data.messenger.model.MessageObject;
+import com.digzdigital.cumessenger.databinding.FragmentForumMessagesBinding;
 import com.digzdigital.cumessenger.eventbus.EventType;
 import com.digzdigital.cumessenger.eventbus.FirebaseEvent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.zakariya.stickyheaders.StickyHeaderLayoutManager;
 
 import java.util.ArrayList;
 
@@ -27,28 +28,27 @@ import javax.inject.Inject;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link ManageCoursesFragment.OnFragmentInteractionListener} interface
+ * {@link ForumMessagesFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link ManageCoursesFragment#newInstance} factory method to
+ * Use the {@link ForumMessagesFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ManageCoursesFragment extends Fragment {
+public class ForumMessagesFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-    private ArrayList<Course> courses;
+    private Forum forum;
+
     @Inject
     public DataManager dataManager;
-    private RecyclerView courseRV;
+    private FragmentForumMessagesBinding binding;
+    private OnFragmentInteractionListener listener;
+    private ArrayList<MessageObject> forumMessages;
 
-    private OnFragmentInteractionListener mListener;
-
-    public ManageCoursesFragment() {
+    public ForumMessagesFragment() {
         // Required empty public constructor
     }
 
@@ -56,16 +56,14 @@ public class ManageCoursesFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ManageCoursesFragment.
+     * @param forum Parameter 1.
+     * @return A new instance of fragment ForumMessagesFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static Fragment newInstance(String param1, String param2) {
-        ManageCoursesFragment fragment = new ManageCoursesFragment();
+    public static ForumMessagesFragment newInstance(Forum forum) {
+        ForumMessagesFragment fragment = new ForumMessagesFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putParcelable(ARG_PARAM1, forum);
         fragment.setArguments(args);
         return fragment;
     }
@@ -74,8 +72,7 @@ public class ManageCoursesFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            forum = getArguments().getParcelable(ARG_PARAM1);
         }
     }
 
@@ -83,11 +80,9 @@ public class ManageCoursesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_manage_courses, container, false);
-        courseRV = (RecyclerView)view.findViewById(R.id.courseRv);
-        courses = dataManager.getAllCourses();
-        dataManager.queryForCourses();
-        return view;
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_forum_messages, container, false);
+        dataManager.queryForForumMessages(forum.getId());
+        return binding.getRoot();
     }
 
 
@@ -95,7 +90,7 @@ public class ManageCoursesFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+            listener = (OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -105,7 +100,7 @@ public class ManageCoursesFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        listener = null;
     }
 
     /**
@@ -120,36 +115,45 @@ public class ManageCoursesFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onCourseClicked(Course course);
-    }
-
-    protected void doRest() {
-        courseRV.setLayoutManager(new StickyHeaderLayoutManager());
-        if (courses != null) {
-            if (courses.size() > 0) {
-                ManageCourseListAdapter adapter = new ManageCourseListAdapter();
-                adapter.setCourses(courses);
-                courseRV.setAdapter(adapter);
-            }
-        }
-
     }
 
     @Override
     public void onStart(){
+        super.onStart();
         EventBus.getDefault().register(this);
     }
 
     @Override
     public void onStop(){
+        super.onStop();
         EventBus.getDefault().unregister(this);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onFirebaseEvent(FirebaseEvent event){
-        if (event.type == EventType.COURSES){
-            courses = dataManager.getAllCourses();
-            doRest();
+        if (event.type == EventType.FORUM_MESSAGES)loadForums();
+    }
+
+    private void loadForums() {
+        forumMessages = dataManager.getForumMessages();
+        doRest();
+    }
+
+    private void doRest() {
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+        binding.forumMessagesRv.setLayoutManager(linearLayoutManager);
+
+        if(forumMessages!=null){
+            if (forumMessages.size() >0){
+                ForumMessagesListAdapter forumMessagesListAdapter = new ForumMessagesListAdapter(forumMessages);
+                binding.forumMessagesRv.setAdapter(forumMessagesListAdapter);
+
+                forumMessagesListAdapter.setOnItemClickListener(new ForumMessagesListAdapter.MyClickListener() {
+                    @Override
+                    public void onItemClick(int position, View v) {
+                    }
+                });
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.digzdigital.cumessenger.fragment.user;
+package com.digzdigital.cumessenger.fragment.messaging.user;
 
 import android.content.Context;
 import android.support.v7.widget.CardView;
@@ -17,10 +17,10 @@ import java.util.ArrayList;
 
 public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.ViewHolder> {
     private static MyClickListener myClickListener;
-    ArrayList<User> users;
-    Context context;
+    private ArrayList<User> users;
+    private Context context;
 
-    public UsersListAdapter(ArrayList<User> forums, Context context) {
+    public UsersListAdapter(ArrayList<User> users, Context context) {
         this.users = users;
         this.context = context;
     }
@@ -104,6 +104,7 @@ public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.View
 
 
     }
+
     public void setOnItemClickListener(MyClickListener myClickListener) {
         this.myClickListener = myClickListener;
     }

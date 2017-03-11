@@ -1,16 +1,16 @@
 package com.digzdigital.cumessenger.data.messenger.model;
 
 public class MessageObject {
-    private String userName;
+    private String user;
     private String message;
-    private boolean isMine;
+    private String uid;
 
     public String getUserName() {
-        return userName;
+        return user;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUserName(String user) {
+        this.user = user;
     }
 
     public String getMessage() {
@@ -21,11 +21,11 @@ public class MessageObject {
         this.message = message;
     }
 
-    public boolean isMine() {
-        return isMine;
+    public String getUId() {
+        return uid;
     }
 
-    public void setMine(boolean mine) {
-        isMine = mine;
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 }

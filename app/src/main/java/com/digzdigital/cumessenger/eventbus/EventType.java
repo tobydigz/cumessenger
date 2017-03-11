@@ -4,11 +4,13 @@ package com.digzdigital.cumessenger.eventbus;
  * Created by Digz on 09/03/2017.
  */
 
-public enum EventTypes {
+public enum EventType {
     USER,
     USERS,
     NEW_MESSAGE,
+    MESSAGES,
     FORUMS,
-    FORUM_GROUPS,
-    COURSES;
+    FORUM_MESSAGES,
+    COURSES,
+    ONGOING_MESSAGES
 }

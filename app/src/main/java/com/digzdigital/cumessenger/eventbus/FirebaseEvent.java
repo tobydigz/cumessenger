@@ -5,9 +5,9 @@ package com.digzdigital.cumessenger.eventbus;
  */
 
 public class FirebaseEvent {
-    public final int type;
+    public final EventType type;
 
-    public FirebaseEvent(int type){
+    public FirebaseEvent(EventType type){
         this.type = type;
     }
 }

@@ -11,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
 import com.digzdigital.cumessenger.R;
+import com.digzdigital.cumessenger.data.db.DbHelper;
 import com.digzdigital.cumessenger.data.db.model.Course;
 import com.digzdigital.cumessenger.databinding.FragmentAddCourseBinding;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
@@ -48,7 +49,7 @@ private Course course = new Course();
      * @return A new instance of fragment AddCourseFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static AddCourseFragment newInstance(String param1, String param2) {
+    public static Fragment newInstance(String param1, String param2) {
         AddCourseFragment fragment = new AddCourseFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);

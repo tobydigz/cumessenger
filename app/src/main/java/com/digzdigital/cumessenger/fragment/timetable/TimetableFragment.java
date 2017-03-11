@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.digzdigital.cumessenger.R;
-import com.digzdigital.cumessenger.data.db.DbHelper;
+import com.digzdigital.cumessenger.data.DataManager;
 import com.digzdigital.cumessenger.data.db.model.RowObject;
 import com.digzdigital.cumessenger.databinding.FragmentTimetableBinding;
 
@@ -39,7 +39,7 @@ public class TimetableFragment extends Fragment {
     private FragmentTimetableBinding binding;
     private OnFragmentInteractionListener listener;
     private ArrayList<RowObject> rowObjects;
-    private DbHelper dbHelper;
+    private DataManager dataManager;
 
     public TimetableFragment() {
         // Required empty public constructor
@@ -54,7 +54,7 @@ public class TimetableFragment extends Fragment {
      * @return A new instance of fragment TimetableFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static TimetableFragment newInstance(String param1, String param2) {
+    public static Fragment newInstance(String param1, String param2) {
         TimetableFragment fragment = new TimetableFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
@@ -88,7 +88,7 @@ public class TimetableFragment extends Fragment {
     }
 
     private void loadTableRowItems() {
-        rowObjects = dbHelper.getRowObjects();
+        rowObjects = dataManager.getRowObjects();
         if (rowObjects != null && rowObjects.size() > 0) {
             binding.tableView.setDataAdapter(new TimetableAdapter(getActivity(), rowObjects));
         }

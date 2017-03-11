@@ -1,13 +1,12 @@
 package com.digzdigital.cumessenger.activity;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -15,37 +14,47 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.digzdigital.cumessenger.R;
+import com.digzdigital.cumessenger.data.db.DbHelper;
+import com.digzdigital.cumessenger.data.db.model.Course;
 import com.digzdigital.cumessenger.data.db.model.User;
+import com.digzdigital.cumessenger.data.messenger.model.OngoingMessage;
+import com.digzdigital.cumessenger.fragment.addCourse.AddCourseFragment;
 import com.digzdigital.cumessenger.fragment.editProfile.EditFragment;
+import com.digzdigital.cumessenger.fragment.manageCourse.ManageCoursesFragment;
+import com.digzdigital.cumessenger.fragment.messaging.chat.ChatFragment;
+import com.digzdigital.cumessenger.fragment.messaging.ongoing.OngoingMessagesListFragment;
+import com.digzdigital.cumessenger.fragment.messaging.user.UsersFragment;
 import com.digzdigital.cumessenger.fragment.profile.ProfileFragment;
+import com.digzdigital.cumessenger.fragment.timetable.TimetableFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, ProfileFragment.ProfileFragmentListener, EditFragment.EditFragmentListener {
+        implements NavigationView.OnNavigationItemSelectedListener, ProfileFragment.ProfileFragmentListener, EditFragment.EditFragmentListener, AddCourseFragment.OnFragmentInteractionListener, ManageCoursesFragment.OnFragmentInteractionListener, UsersFragment.OnFragmentInteractionListener, TimetableFragment.OnFragmentInteractionListener, OngoingMessagesListFragment.OnFragmentInteractionListener {
 
     private FirebaseAuth auth;
     private FirebaseUser firebaseUser;
-    private Fragment profileFragment, editFragment;
+    private Fragment profileFragment, editFragment, addCourseFragment, manageCourseFragment, usersFragment, timetableFragment;
     private FragmentManager fragmentManager;
-    private AuthStateListener listener = new AuthStateListener(){
-
+    private DbHelper dbHelper;
+    private AuthStateListener listener = new AuthStateListener() {
         @Override
         public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-            FirebaseUser user = firebaseAuth.getCurrentUser();
-            if (user!=null){
+            firebaseUser = firebaseAuth.getCurrentUser();
+            if (firebaseUser != null) {
                 //Nigga signed in
-            }else {
+                loadDetails();
+            } else {
                 //Nigga signed out
             }
 
         }
     };
-
-
 
 
     @Override
@@ -72,9 +81,23 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        fragmentManager = getFragmentManager();
         auth = FirebaseAuth.getInstance();
         auth.addAuthStateListener(listener);
         //// TODO: 25/02/2017 start Fragment based on signed in user
+
+    }
+
+    private void loadDetails() {
+        if (getIntent() != null) {
+            String id = getIntent().getStringExtra("id");
+            User user = new User();
+            user.setId(id);
+            user.setUid(firebaseUser.getEmail());
+            switchFragment(createEditFragment(user));
+        } else {
+            switchFragment(getProfileFragment());
+        }
     }
 
     @Override
@@ -115,33 +138,32 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        if (id == R.id.nav_profile) {
+            switchFragment(getProfileFragment());
+        } else if (id == R.id.nav_courses) {
 
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.nav_forum) {
 
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_messaging) {
 
-        } else if (id == R.id.nav_share) {
+        } else if (id == R.id.nav_signout) {
 
-        } else if (id == R.id.nav_send) {
+        }else if (id == R.id.nav_people) {
 
         }
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
     @Override
-    public void onStart(){
+    public void onStart() {
         super.onStart();
         auth.addAuthStateListener(listener);
     }
 
     @Override
-    public void onStop(){
+    public void onStop() {
         super.onStop();
         auth.removeAuthStateListener(listener);
     }
@@ -151,25 +173,60 @@ public class MainActivity extends AppCompatActivity
         switchFragment(createEditFragment(user));
     }
 
-    private void switchFragment(Fragment fragment){
+    private void switchFragment(Fragment fragment) {
         fragmentManager.beginTransaction()
                 .replace(R.id.content_main, fragment)
-                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
                 .addToBackStack(null)
                 .commit();
     }
 
-    private Fragment createEditFragment(User user){
+    private Fragment createEditFragment(User user) {
         return EditFragment.newInstance(user);
     }
 
-    private Fragment getProfileFragment(){
-        if (profileFragment == null) profileFragment = new ProfileFragment();
+    private Fragment createChatFragment(String username, String chatWithUsername, String uid) {
+        return ChatFragment.newInstance(username, chatWithUsername, uid);
+    }
+
+    private Fragment createUsersFragment() {
+        return UsersFragment.newInstance("", "");
+    }
+
+    private Fragment getProfileFragment() {
+        if (profileFragment == null)
+            profileFragment = ProfileFragment.newInstance(firebaseUser.getUid());
         return profileFragment;
     }
 
     @Override
-    public void onSaveChanges() {
+    public void onSaveChanges(String name) {
+        //todo updateFirebaseUser
         switchFragment(getProfileFragment());
+    }
+
+    @Override
+    public void onCancelClicked() {
+
+    }
+
+    @Override
+    public void onSaveClicked(Course course) {
+        dbHelper.createCourse(course, firebaseUser.getUid());
+    }
+
+    @Override
+    public void onCourseClicked(Course course) {
+
+    }
+
+    @Override
+    public void onUserClicked(String username) {
+        switchFragment(createChatFragment(firebaseUser.getUid(), username, firebaseUser.getUid()));
+    }
+
+    @Override
+    public void onOngoingMessageClicked(OngoingMessage ongoingMessage) {
+        createChatFragment(ongoingMessage.getUserName(), ongoingMessage.getChatWithUsername(), firebaseUser.getUid());
     }
 }

@@ -5,11 +5,12 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".fragment.messaging.user.UsersFragment">
+        tools:context="com.digzdigital.cumessenger.fragment.messaging.ongoing.OngoingMessagesListFragment">
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/usersRv"
+            android:id="@+id/ongoingRv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
+
     </FrameLayout>
 </layout>

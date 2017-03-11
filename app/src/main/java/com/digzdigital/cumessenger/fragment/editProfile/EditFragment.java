@@ -1,16 +1,15 @@
 package com.digzdigital.cumessenger.fragment.editProfile;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.digzdigital.cumessenger.R;
 import com.digzdigital.cumessenger.data.DataManager;
-import com.digzdigital.cumessenger.data.db.DbHelper;
 import com.digzdigital.cumessenger.data.db.model.User;
 import com.digzdigital.cumessenger.databinding.FragmentEditBinding;
 import com.google.firebase.database.DatabaseReference;
@@ -34,7 +33,7 @@ public class EditFragment extends Fragment implements View.OnClickListener {
     // TODO: Rename and change types of parameters
     private User user = null;
 
-    private DbHelper dbHelper;
+    private DataManager dataManager;
 
     private EditFragmentListener listener;
 
@@ -50,7 +49,7 @@ public class EditFragment extends Fragment implements View.OnClickListener {
      * @return A new instance of fragment BlankFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static EditFragment newInstance(User user) {
+    public static Fragment newInstance(User user) {
         EditFragment fragment = new EditFragment();
         Bundle args = new Bundle();
         args.putParcelable(ARG_PARAM1, user);
@@ -72,11 +71,18 @@ public class EditFragment extends Fragment implements View.OnClickListener {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_edit, container, false);
         databaseReference = FirebaseDatabase.getInstance().getReference().child("users");
-        if (user != null) updateUI();
+        if (user != null) {
+            try {
+                updateUI();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         return binding.getRoot();
     }
 
-    private void updateUI() {
+    private void updateUI() throws Exception{
+
         binding.profileName.setText(user.getName());
         binding.profileYear.setText(user.getGraduationYear());
         binding.userDepartment.setText(user.getDepartment());
@@ -121,10 +127,8 @@ public class EditFragment extends Fragment implements View.OnClickListener {
         user.setGraduationYear(2018);
         user.setPhoneNumber("");
         user.setEmail("");
-        user.setId("");
-        dbHelper.updateUser(user);
-        // databaseReference.child(user.getId()).setValue(user);
-        listener.onSaveChanges();
+        dataManager.updateUser(user);
+        listener.onSaveChanges(user.getName());
     }
 
     /**
@@ -139,6 +143,6 @@ public class EditFragment extends Fragment implements View.OnClickListener {
      */
     public interface EditFragmentListener {
         // TODO: Update argument type and name
-        void onSaveChanges();
+        void onSaveChanges(String displayName);
     }
 }

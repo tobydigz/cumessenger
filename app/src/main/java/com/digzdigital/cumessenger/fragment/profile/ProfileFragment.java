@@ -9,14 +9,15 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.digzdigital.cumessenger.R;
+import com.digzdigital.cumessenger.data.DataManager;
 import com.digzdigital.cumessenger.data.db.model.User;
 import com.digzdigital.cumessenger.databinding.FragmentProfileBinding;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.digzdigital.cumessenger.eventbus.EventType;
+import com.digzdigital.cumessenger.eventbus.FirebaseEvent;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -24,20 +25,16 @@ import com.google.firebase.database.ValueEventListener;
  * Use the {@link ProfileFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ProfileFragment extends Fragment implements View.OnClickListener{
+public class ProfileFragment extends Fragment implements View.OnClickListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-    private FirebaseAuth auth;
-    private DatabaseReference databaseReference;
+    private String uid;
     private FragmentProfileBinding binding;
-    private String schoolID;
-    private User user;
+    private DataManager dataManager;
+    private User user = new User();
     private ProfileFragmentListener listener;
 
 
@@ -49,16 +46,14 @@ public class ProfileFragment extends Fragment implements View.OnClickListener{
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
+     * @param uid Parameter 1.
      * @return A new instance of fragment ProfileFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ProfileFragment newInstance(String param1, String param2) {
+    public static Fragment newInstance(String uid) {
         ProfileFragment fragment = new ProfileFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putString(ARG_PARAM1, uid);
         fragment.setArguments(args);
         return fragment;
     }
@@ -67,8 +62,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            uid = getArguments().getString(ARG_PARAM1);
         }
     }
 
@@ -77,28 +71,44 @@ public class ProfileFragment extends Fragment implements View.OnClickListener{
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_profile, container, false);
+        binding.editProfile.setEnabled(false);
+        showProgressDialog();
+        updateUI();
+        loadUser();
         return binding.getRoot();
     }
 
-    @Override
-    public void onStart(){
-        super.onStart();
-        databaseReference = FirebaseDatabase.getInstance().getReference();
+    private void showProgressDialog() {
+
     }
 
-    private void loadUser(){
-        databaseReference.child(schoolID).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                user = dataSnapshot.getValue(User.class);
-                updateUI();
-            }
+    private void dismissProgressDialog(){
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+    }
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
 
-            }
-        });
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().register(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onFirebaseEvent(FirebaseEvent event) {
+        dismissProgressDialog();
+        if (event.type == EventType.USER) {
+            user = dataManager.getUserInfo();
+            binding.editProfile.setEnabled(true);
+            updateUI();
+        }
+    }
+
+    private void loadUser() {
+        dataManager.queryForUserInfo(uid);
     }
 
     private void updateUI() {
@@ -111,7 +121,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener{
         binding.userEmail.setText(user.getEmail());
         binding.userPhone.setText(user.getPhoneNumber());
     }
-
 
 
     @Override

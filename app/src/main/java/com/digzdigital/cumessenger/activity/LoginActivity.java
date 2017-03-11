@@ -16,23 +16,32 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener, OnCompleteListener<AuthResult> {
 
     private ActivityLoginBinding binding;
     private FirebaseAuth auth;
+    private String id = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
         auth = FirebaseAuth.getInstance();
-        if (auth.getCurrentUser() != null) {
-            switchActivity(MainActivity.class);
-        }
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login);
+        if (getIntent()!=null){
+            Intent intent = getIntent();
+            String email = intent.getStringExtra("email");
+            String password = intent.getStringExtra("password");
+            id = intent.getStringExtra("id");
 
+            binding.email.setText(email);
+            binding.password.setText(password);
+        }
         binding.btnLogin.setOnClickListener(this);
         binding.btnResetPassword.setOnClickListener(this);
         binding.btnSignup.setOnClickListener(this);
@@ -108,6 +117,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private void switchActivity(Class classFile) {
         Intent intent = new Intent(this, classFile);
+        if (id != null){
+            intent.putExtra("id", id);
+        }
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }

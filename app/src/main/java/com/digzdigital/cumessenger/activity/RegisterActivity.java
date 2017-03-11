@@ -21,6 +21,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
     private ActivityRegisterBinding binding;
     private FirebaseAuth auth;
+    private String email, password, id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,8 +33,13 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         binding.signUpButton.setOnClickListener(this);
     }
 
-    private void switchActivity(Class classFile) {
+    private void switchActivity(Class classFile, boolean addExtras) {
         Intent intent = new Intent(this, classFile);
+        if (addExtras) {
+            intent.putExtra("email", email);
+            intent.putExtra("password", password);
+            intent.putExtra("id", id);
+        }
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
@@ -42,10 +48,10 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_reset_password:
-                switchActivity(ResetPasswordActivity.class);
+                switchActivity(ResetPasswordActivity.class, false);
                 break;
             case R.id.sign_in_button:
-                switchActivity(LoginActivity.class);
+                switchActivity(LoginActivity.class, false);
                 break;
             case R.id.sign_up_button:
                 signup();
@@ -56,60 +62,78 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private void signup() {
         String email = binding.email.getText().toString().trim();
         String password = binding.password.getText().toString().trim();
-        if (!validateEmail(email) || !validatePassword(password)) return;
+        String id = binding.matric.getText().toString().toUpperCase().trim();
+        if (!validateEmail(email) || !validatePassword(password) || validateId(id)) return;
         binding.progressBar.setVisibility(View.VISIBLE);
         binding.signUpButton.setEnabled(false);
+        this.email = email;
+        this.password = password;
+        this.id = id;
         auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, this);
+    }
+
+    private boolean validateId(String id) {
+        boolean state = true;
+        if (TextUtils.isEmpty(id)) {
+            Snackbar.make(binding.activitySignUp, "Enter email address!", Snackbar.LENGTH_SHORT).show();
+            binding.email.setError("Enter email address!");
+            state = false;
+
+        } else binding.email.setError(null);
+        return state;
     }
 
 
     private boolean validateEmail(String email) {
+        boolean state = true;
         if (TextUtils.isEmpty(email)) {
             Snackbar.make(binding.activitySignUp, "Enter email address!", Snackbar.LENGTH_SHORT).show();
             binding.email.setError("Enter email address!");
-            return false;
+            state = false;
 
         } else binding.email.setError(null);
 
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             Snackbar.make(binding.activitySignUp, "Enter a valid email address!", Snackbar.LENGTH_SHORT).show();
             binding.email.setError("Enter a valid email address!");
-            return false;
+            state = false;
         } else binding.email.setError(null);
 
         int pointAt = email.indexOf("@") + 1;
         if (!((email.substring(pointAt).equals("covenantuniversity.edu.ng")) || (email.substring(pointAt).equals("stu.cu.edu.ng")))) {
             Snackbar.make(binding.activitySignUp, "Enter a valid Covenant University email address!", Snackbar.LENGTH_SHORT).show();
             binding.email.setError("Enter a valid Covenant University email address!");
-            return false;
+            state = false;
         } else binding.email.setError(null);
 
-        return true;
+        return state;
     }
 
     private boolean validatePassword(String password) {
+        boolean state = true;
         if (TextUtils.isEmpty(password)) {
             Snackbar.make(binding.activitySignUp, "Enter password", Snackbar.LENGTH_SHORT).show();
             binding.password.setError("Enter password");
-            return false;
+            state = false;
         } else binding.password.setError(null);
 
         if (password.length() < 6) {
             Snackbar.make(binding.activitySignUp, "Password too short, enter minimum 6 characters!", Snackbar.LENGTH_SHORT).show();
             binding.password.setError("Password too short");
-            return false;
+            state = false;
         } else binding.password.setError(null);
-        return true;
+        return state;
     }
 
     @Override
     public void onComplete(@NonNull Task<AuthResult> task) {
         binding.progressBar.setVisibility(View.GONE);
-
         if (!task.isSuccessful()) {
             Snackbar.make(binding.activitySignUp, "Sign Up failed, try again", Snackbar.LENGTH_SHORT).show();
             binding.signUpButton.setEnabled(true);
-        } else switchActivity(MainActivity.class);
+        } else {
+            switchActivity(LoginActivity.class, true);
+        }
 
     }
 }

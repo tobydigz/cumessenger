@@ -47,6 +47,23 @@
                 app:mtf_image="@drawable/ic_book_black_24dp">
 
                 <EditText
+                    android:id="@+id/matric"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusableInTouchMode="true"
+                    android:hint="Matric No or Staff Id"
+                    android:maxLines="1"
+                    android:textColor="@android:color/white" />
+            </com.github.florent37.materialtextfield.MaterialTextField>
+
+            <com.github.florent37.materialtextfield.MaterialTextField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:mtf_animationDuration="1000"
+                app:mtf_cardCollapsedHeight="4dp"
+                app:mtf_image="@drawable/ic_book_black_24dp">
+
+                <EditText
                     android:id="@+id/password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

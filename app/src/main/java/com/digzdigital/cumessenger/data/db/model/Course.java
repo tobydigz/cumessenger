@@ -7,7 +7,7 @@ import java.util.Date;
 
 public class Course/* extends RealmObject*/{
 
-    private long id;
+    private String id;
     private String courseCode;
     private String courseTitle;
     private String venue;
@@ -19,11 +19,11 @@ public class Course/* extends RealmObject*/{
     public Course() {
     }
 
-    public long getId() {
+    public String  getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
