@@ -25,7 +25,7 @@ public class AppApiHelper implements ApiHelper {
     private ArrayList<Forum> fora;
     private String username, chatWithUsername;
     private int messageCounter = 1;
-    private ArrayList<OngoingMessage> ongoingMessages;
+    private ArrayList<OngoingMessage> ongoingMessages = new ArrayList<>();
 
     public AppApiHelper() {
         databaseReference = FirebaseDatabase.getInstance().getReference();
@@ -37,6 +37,8 @@ public class AppApiHelper implements ApiHelper {
         this.chatWithUsername = chatWithUsername;
     }
 
+
+
     @Override
     public void SendMessage(MessageObject messageObject) {
         databaseReference.child("messages").child(username).child(chatWithUsername).push().setValue(messageObject);
@@ -44,8 +46,8 @@ public class AppApiHelper implements ApiHelper {
     }
 
     @Override
-    public void queryForMessages() {
-        databaseReference.child("messages").child(username).child(chatWithUsername).addValueEventListener(new ValueEventListener() {
+    public void queryForMessages(String userid, String chatWithUserid) {
+        databaseReference.child("messages").child(userid).child(chatWithUserid).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -57,14 +59,10 @@ public class AppApiHelper implements ApiHelper {
                     postEvent(EventType.MESSAGES);
                     messageCounter++;
                 }
-
-
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
+            public void onCancelled(DatabaseError databaseError) {}
         });
     }
 
@@ -78,9 +76,7 @@ public class AppApiHelper implements ApiHelper {
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
@@ -113,7 +109,7 @@ public class AppApiHelper implements ApiHelper {
 
     @Override
     public void queryForForums() {
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        databaseReference.child("forums").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 fora = null;
@@ -140,7 +136,7 @@ public class AppApiHelper implements ApiHelper {
 
     @Override
     public void queryForForumMessages(String forumName) {
-        databaseReference.child("forums").child(forumName).addValueEventListener(new ValueEventListener() {
+        databaseReference.child("forums").child(forumName).child("messages").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 forumMessages = null;
@@ -166,18 +162,20 @@ public class AppApiHelper implements ApiHelper {
 
     @Override
     public void postForumMessage(MessageObject messageObject, String forumName) {
-        databaseReference.child("forums/" + forumName).push().setValue(messageObject);
+        databaseReference.child("forums").child(forumName).child("messages").push().setValue(messageObject);
     }
 
     @Override
-    public void queryForOngoingMessages(final String username) {
-        databaseReference.child("messages").child(username).addValueEventListener(new ValueEventListener() {
+    public void queryForOngoingMessages(final String userid) {
+        databaseReference.child("messages").child(userid).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot: dataSnapshot.getChildren()){
                     OngoingMessage ongoingMessage = new OngoingMessage();
-                    ongoingMessage.setUserName(username);
-                    ongoingMessage.setChatWithUsername(snapshot.getKey());
+                    ongoingMessage.setUserId(userid);
+                    ongoingMessage.setChatWithUserId(snapshot.getKey());
+                    ongoingMessage.setUserName((String)snapshot.child("userName").getValue());
+                    ongoingMessage.setChatWithUserName((String)snapshot.child("chatWithUserName").getValue());
                     ongoingMessages.add(ongoingMessage);
                 }
                 postEvent(EventType.ONGOING_MESSAGES);

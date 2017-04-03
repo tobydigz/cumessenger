@@ -40,7 +40,7 @@ public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.View
         User user = getItem(position);
 
         holder.userName.setText(user.getName());
-        holder.userId.setText(user.getId());
+        // holder.userId.setText(user.getId());
         // TODO: 08/03/2017 use glide/picasso to load image
         // holder.forumImage.setImageResource(forum.getImageResId());
 
@@ -89,7 +89,7 @@ public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.View
         ImageView userImage;
         ViewHolder(View itemView) {
             super(itemView);
-            userId = (TextView) itemView.findViewById(R.id.userId);
+            // userId = (TextView) itemView.findViewById(R.id.userId);
             userName = (TextView) itemView.findViewById(R.id.userName);
             userImage = (ImageView) itemView.findViewById(R.id.userImage);
             itemView.setOnClickListener(this);

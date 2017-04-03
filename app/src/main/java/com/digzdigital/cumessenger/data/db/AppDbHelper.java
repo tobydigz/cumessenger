@@ -26,36 +26,32 @@ public class AppDbHelper implements DbHelper {
     private ArrayList<User> users;
     private DatabaseReference databaseReference;
 
+
     public AppDbHelper() {
         databaseReference = FirebaseDatabase.getInstance().getReference();
     }
 
     @Override
-    public void createCourse(Course course, String userId) {
+    public String getUsername(){
 
-        databaseReference.child("userCourses").child(userId).child(course.getId()).setValue(course);
+        return userInfo.getId();
     }
 
     @Override
-    public void queryForCourses() {
-        databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                courses = null;
-                courses = new ArrayList<>();
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Course course = snapshot.getValue(Course.class);
-                    courses.add(course);
-                }
-                postEvent(EventType.COURSES);
-            }
+    public boolean createCourse(Course course, String userId) {
+        if ((Course.find(Course.class, "time = ? and day = ?", course.getTime().toString(), course.getDay().toString())).size() > 0)
+            return false;
+        course.save();
+        return true;
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
     }
+
+    @Override
+    public ArrayList<Course> queryForCourses() {
+        return new ArrayList<>(Course.findWithQuery(Course.class, "Select * from Course ORDER BY day"));
+        // return new ArrayList<>(Course.listAll(Course.class));
+    }
+
 
     @Override
     public ArrayList<Course> getAllCourses() {
@@ -63,21 +59,38 @@ public class AppDbHelper implements DbHelper {
     }
 
     @Override
-    public boolean deleteCourse(String key) {
-        databaseReference.child(key).removeValue();
+    public boolean deleteCourse(Course course) {
+        Course course1 = Course.findById(Course.class, course.getId());
+        course1.delete();
         return false;
     }
 
     @Override
-    public boolean updateCourse(Course course) {
-        databaseReference.setValue(course);
+    public boolean updateCourse(Course course, String userId) {
+        Course course1 = Course.findById(Course.class, course.getId());
+        course1.setCourseTitle(course.getCourseTitle());
+        course1.setVenue(course.getVenue());
+        course1.setCourseCode(course.getCourseCode());
+        course1.setDuration(course.getDuration());
+        course1.setDay(course.getDay());
+        course1.setTime(course.getTime());
+        course1.save();
         return false;
+    }
+
+
+    private ArrayList<RowObject> createRowObjects() {
+        ArrayList<Course> results = queryForCourses();
+
+        RowObjectsCreator creator = new RowObjectsCreator(results);
+
+        return creator.getRows();
     }
 
 
     @Override
     public ArrayList<RowObject> getRowObjects() {
-        return null;
+        return createRowObjects();
     }
 
     @Override
@@ -108,13 +121,46 @@ public class AppDbHelper implements DbHelper {
 
     @Override
     public void queryForUsers(String userId) {
-        databaseReference.child("users").child(userId).child("usersKnown").addValueEventListener(new ValueEventListener() {
+        databaseReference.child("usersKnown").child(userId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 users = null;
                 users = new ArrayList<>();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    User user = snapshot.getValue(User.class);
+                    User user = new User();
+                    String firstName = (String)snapshot.child("firstName").getValue();
+                    String lastName = (String)snapshot.child("lastName").getValue();
+                    String id = snapshot.getKey();
+                    user.setFirstName(firstName);
+                    user.setLastName(lastName);
+                    user.setUid(id);
+                    users.add(user);
+                }
+                postEvent(EventType.USERS);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    @Override
+    public void searchForUsers(String param) {
+        databaseReference.child("usersKnown").child(param).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                users = null;
+                users = new ArrayList<>();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    User user = new User();
+                    String firstName = (String)snapshot.child("firstName").getValue();
+                    String lastName = (String)snapshot.child("lastName").getValue();
+                    String id = (String)snapshot.child("id").getValue();
+                    user.setFirstName(firstName);
+                    user.setLastName(lastName);
+                    user.setId(id);
                     users.add(user);
                 }
                 postEvent(EventType.USERS);

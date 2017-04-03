@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.digzdigital.cumessenger.R;
+import com.digzdigital.cumessenger.activity.MainActivity;
 import com.digzdigital.cumessenger.data.DataManager;
 import com.digzdigital.cumessenger.data.messenger.model.OngoingMessage;
 import com.digzdigital.cumessenger.databinding.FragmentMessagesListBinding;
@@ -37,10 +38,10 @@ public class OngoingMessagesListFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
-    private String username;
+    private String userid;
     private String mParam2;
     private FragmentMessagesListBinding binding;
-    private DataManager dataManager;
+    public DataManager dataManager;
     private ArrayList<OngoingMessage> ongoingMessages;
 
     private OnFragmentInteractionListener listener;
@@ -68,8 +69,10 @@ public class OngoingMessagesListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MainActivity activity = (MainActivity)getActivity();
+        dataManager = activity.getDataManager();
         if (getArguments() != null) {
-            username = getArguments().getString(ARG_PARAM1);
+            userid = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
@@ -79,7 +82,7 @@ public class OngoingMessagesListFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_messages_list, container, false);
-        dataManager.queryForOngoingMessages(username);
+        dataManager.queryForOngoingMessages(userid);
         return binding.getRoot();
     }
 

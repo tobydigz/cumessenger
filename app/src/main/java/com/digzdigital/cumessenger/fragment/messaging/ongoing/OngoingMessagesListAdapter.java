@@ -1,7 +1,6 @@
 package com.digzdigital.cumessenger.fragment.messaging.ongoing;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -37,7 +36,7 @@ public class OngoingMessagesListAdapter extends RecyclerView.Adapter<OngoingMess
     public void onBindViewHolder(ViewHolder holder, final int position) {
         OngoingMessage ongoingMessage = getItem(position);
 
-        holder.textField.setText("Chat with" + ongoingMessage.getChatWithUsername());
+        holder.textField.setText("Chat with" + ongoingMessage.getChatWithUserId());
     }
 
     @Override

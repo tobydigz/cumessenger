@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.digzdigital.cumessenger.R;
+import com.digzdigital.cumessenger.activity.MainActivity;
 import com.digzdigital.cumessenger.data.DataManager;
 import com.digzdigital.cumessenger.data.db.model.User;
 import com.digzdigital.cumessenger.databinding.FragmentProfileBinding;
@@ -18,6 +19,8 @@ import com.digzdigital.cumessenger.eventbus.FirebaseEvent;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import javax.inject.Inject;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -33,7 +36,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     // TODO: Rename and change types of parameters
     private String uid;
     private FragmentProfileBinding binding;
-    private DataManager dataManager;
+    public DataManager dataManager;
     private User user = new User();
     private ProfileFragmentListener listener;
 
@@ -61,6 +64,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MainActivity activity = (MainActivity)getActivity();
+        dataManager = activity.getDataManager();
         if (getArguments() != null) {
             uid = getArguments().getString(ARG_PARAM1);
         }
@@ -94,7 +99,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onStop() {
         super.onStop();
-        EventBus.getDefault().register(this);
+        EventBus.getDefault().unregister(this);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -113,6 +118,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
     private void updateUI() {
         binding.profileName.setText(user.getName());
+        binding.profileId.setText(user.getId());
         binding.profileYear.setText(user.getGraduationYear());
         binding.userDepartment.setText(user.getDepartment());
         binding.userProgramme.setText(user.getProgramme());

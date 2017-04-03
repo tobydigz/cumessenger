@@ -9,11 +9,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.digzdigital.cumessenger.R;
+import com.digzdigital.cumessenger.activity.MainActivity;
 import com.digzdigital.cumessenger.data.DataManager;
 import com.digzdigital.cumessenger.data.db.model.User;
 import com.digzdigital.cumessenger.databinding.FragmentEditBinding;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import javax.inject.Inject;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -24,13 +27,10 @@ import com.google.firebase.database.FirebaseDatabase;
  * create an instance of this fragment.
  */
 public class EditFragment extends Fragment implements View.OnClickListener {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private DatabaseReference databaseReference;
     private FragmentEditBinding binding;
-    // TODO: Rename and change types of parameters
     private User user = null;
 
     private DataManager dataManager;
@@ -70,7 +70,9 @@ public class EditFragment extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_edit, container, false);
-        databaseReference = FirebaseDatabase.getInstance().getReference().child("users");
+        binding.saveUser.setOnClickListener(this);
+        MainActivity activity = (MainActivity)getActivity();
+        dataManager = activity.getDataManager();
         if (user != null) {
             try {
                 updateUI();
@@ -83,7 +85,9 @@ public class EditFragment extends Fragment implements View.OnClickListener {
 
     private void updateUI() throws Exception{
 
-        binding.profileName.setText(user.getName());
+        binding.profileFirstName.setText(user.getFirstName());
+        binding.profileMiddleName.setText(user.getMiddleName());
+        binding.profileLastName.setText(user.getLastName());
         binding.profileYear.setText(user.getGraduationYear());
         binding.userDepartment.setText(user.getDepartment());
         binding.userProgramme.setText(user.getProgramme());
@@ -117,18 +121,18 @@ public class EditFragment extends Fragment implements View.OnClickListener {
 
     private void writeToDb() {
         if (user == null) user = new User();
-        user.setFirstName("");
-        user.setLastName("");
-        user.setMiddleName("");
-        user.setDepartment("");
-        user.setProgramme("");
-        user.setDateOfBirth("");
-        user.setStatus("");
-        user.setGraduationYear(2018);
-        user.setPhoneNumber("");
-        user.setEmail("");
+        user.setFirstName(binding.profileFirstName.getText().toString());
+        user.setLastName(binding.profileMiddleName.getText().toString());
+        user.setMiddleName(binding.profileLastName.getText().toString());
+        user.setDepartment(binding.userDepartment.getText().toString());
+        user.setProgramme(binding.userProgramme.getText().toString());
+        user.setDateOfBirth(binding.userDOB.getText().toString());
+        user.setStatus(binding.userStatus.getText().toString());
+        user.setGraduationYear(Integer.parseInt(binding.profileYear.getText().toString()));
+        user.setPhoneNumber(binding.userPhone.getText().toString());
         dataManager.updateUser(user);
-        listener.onSaveChanges(user.getName());
+        MainActivity activity = (MainActivity)getActivity();
+        activity.onSaveChanges(user);
     }
 
     /**
@@ -143,6 +147,6 @@ public class EditFragment extends Fragment implements View.OnClickListener {
      */
     public interface EditFragmentListener {
         // TODO: Update argument type and name
-        void onSaveChanges(String displayName);
+        void onSaveChanges(User user);
     }
 }

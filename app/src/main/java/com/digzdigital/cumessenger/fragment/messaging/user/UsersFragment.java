@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.digzdigital.cumessenger.R;
+import com.digzdigital.cumessenger.activity.MainActivity;
 import com.digzdigital.cumessenger.data.DataManager;
 import com.digzdigital.cumessenger.data.db.model.User;
 import com.digzdigital.cumessenger.databinding.FragmentUsersBinding;
@@ -21,8 +22,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
-
-import javax.inject.Inject;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -39,14 +38,14 @@ public class UsersFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
+    private String userId;
     private String mParam2;
 
     private FragmentUsersBinding binding;
     private OnFragmentInteractionListener listener;
-    @Inject
     public DataManager dataManager;
     private ArrayList<User> users;
+    private MainActivity activity;
 
     public UsersFragment() {
         // Required empty public constructor
@@ -56,15 +55,15 @@ public class UsersFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
+     * @param userId Parameter 1.
      * @param param2 Parameter 2.
      * @return A new instance of fragment UsersFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static Fragment newInstance(String param1, String param2) {
+    public static Fragment newInstance(String userId, String param2) {
         UsersFragment fragment = new UsersFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM1, userId);
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
@@ -73,8 +72,10 @@ public class UsersFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        activity = (MainActivity)getActivity();
+        dataManager = activity.getDataManager();
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
+            userId = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
@@ -84,26 +85,8 @@ public class UsersFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_users, container, false);
-
+dataManager.queryForUsers(userId);
         return binding.getRoot();
-    }
-
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            listener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        listener = null;
     }
 
     private void loadUsers() {
@@ -124,7 +107,7 @@ public class UsersFragment extends Fragment {
                     @Override
                     public void onItemClick(int position, View v) {
                         String username = users.get(position).getUid();
-                        listener.onUserClicked(username);
+                        activity.onUserClicked(username);
                     }
                 });
             }

@@ -21,6 +21,7 @@ public class ManageCourseListAdapter extends SectioningAdapter {
     private ArrayList<Course> courses;
     private ArrayList<Section> sections = new ArrayList<>();
 
+    private static MyClickListener myClickListener;
     public ManageCourseListAdapter() {
 
     }
@@ -33,16 +34,16 @@ public class ManageCourseListAdapter extends SectioningAdapter {
         String dayText;
         Section currentSection = null;
         for(Course course : courses){
-          if (course.getDayInt() != alpha){
-              if (currentSection !=null){
-                  sections.add(currentSection);
-              }
+            if (course.getDayInt() != alpha){
+                if (currentSection !=null){
+                    sections.add(currentSection);
+                }
 
-              currentSection = new Section();
-              alpha = course.getDayInt();
-              currentSection.day = course.getDay();
+                currentSection = new Section();
+                alpha = course.getDayInt();
+                currentSection.day = course.getDayText();
 
-          }
+            }
 
             if (currentSection !=null){
                 currentSection.courses.add(course);
@@ -103,15 +104,16 @@ public class ManageCourseListAdapter extends SectioningAdapter {
 
         itemViewHolder.courseTitle.setText(course.getCourseTitle());
         itemViewHolder.courseVenue.setText(course.getVenue());
-        itemViewHolder.courseTime.setText(course.getStartTime().toString());
-        itemViewHolder.courseImage.setImageDrawable(createDrawable(course.getCourseTitle()));
+        itemViewHolder.courseTime.setText(course.getStartTime());
+        itemViewHolder.courseImage.setImageDrawable(createDrawable(course.getCourseCode()));
     }
 
     private TextDrawable createDrawable(String name) {
         ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
-        int color1 = generator.getRandomColor();
+        int color1 = generator.getColor(name);
         TextDrawable.IBuilder builder = TextDrawable.builder()
                 .beginConfig()
+                .toUpperCase()
                 .withBorder(4)
                 .endConfig()
                 .roundRect(10);
@@ -123,7 +125,7 @@ public class ManageCourseListAdapter extends SectioningAdapter {
         ArrayList<Course> courses = new ArrayList<>();
     }
 
-    public class ItemViewHolder extends SectioningAdapter.ItemViewHolder {
+    public class ItemViewHolder extends SectioningAdapter.ItemViewHolder implements  View.OnClickListener{
 
         ImageView courseImage;
         TextView courseTitle, courseVenue, courseTime;
@@ -134,6 +136,18 @@ public class ManageCourseListAdapter extends SectioningAdapter {
             courseTitle = (TextView) itemView.findViewById(R.id.courseTitle);
             courseTime = (TextView) itemView.findViewById(R.id.courseTime);
             courseVenue = (TextView) itemView.findViewById(R.id.courseVenue);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            int adapterPosition = getAdapterPosition();
+            final int sectionInt = ManageCourseListAdapter.this.getSectionForAdapterPosition(adapterPosition);
+            final int itemInt = ManageCourseListAdapter.this.getPositionOfItemInSection(sectionInt, adapterPosition);
+            Section section = sections.get(sectionInt);
+            Course course = section.courses.get(itemInt);
+            // Course course = new Course();
+            myClickListener.onItemClick(course, v);
         }
     }
 
@@ -145,6 +159,15 @@ public class ManageCourseListAdapter extends SectioningAdapter {
             super(itemView);
             dayText = (TextView) itemView.findViewById(R.id.titleTextView);
         }
+    }
+
+
+    public void setOnItemClickListener(MyClickListener myClickListener) {
+        this.myClickListener = myClickListener;
+    }
+
+    public interface MyClickListener {
+        public void onItemClick(Course course, View v);
     }
 }
 

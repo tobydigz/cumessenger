@@ -1,5 +1,6 @@
 package com.digzdigital.cumessenger.data;
 
+import com.digzdigital.cumessenger.MessengerApplication;
 import com.digzdigital.cumessenger.data.db.DbHelper;
 import com.digzdigital.cumessenger.data.db.model.Course;
 import com.digzdigital.cumessenger.data.db.model.RowObject;
@@ -21,17 +22,23 @@ public class AppDataManager implements DataManager {
     public ApiHelper apiHelper;
 
     public AppDataManager() {
+        MessengerApplication.getInstance().getAppComponent().inject(this);
+    }
+
+    @Override
+    public String getUsername() {
+        return dbHelper.getUsername();
+    }
+
+    @Override
+    public boolean createCourse(Course course, String userId) {
+        return dbHelper.createCourse(course, userId);
 
     }
 
     @Override
-    public void createCourse(Course course, String userId) {
-        dbHelper.createCourse(course, userId);
-    }
-
-    @Override
-    public void queryForCourses() {
-        dbHelper.queryForCourses();
+    public ArrayList<Course> queryForCourses() {
+        return dbHelper.queryForCourses();
     }
 
     @Override
@@ -40,15 +47,14 @@ public class AppDataManager implements DataManager {
     }
 
     @Override
-    public boolean deleteCourse(String key) {
-        dbHelper.deleteCourse(key);
+    public boolean deleteCourse(Course course) {
+        dbHelper.deleteCourse(course);
         return true;
     }
 
     @Override
-    public boolean updateCourse(Course course) {
-        dbHelper.updateCourse(course);
-        return false;
+    public boolean updateCourse(Course course, String userId) {
+       return dbHelper.updateCourse(course, userId);
     }
 
     @Override
@@ -77,6 +83,11 @@ public class AppDataManager implements DataManager {
     }
 
     @Override
+    public void searchForUsers(String userId) {
+
+    }
+
+    @Override
     public ArrayList<User> getUsers() {
         return dbHelper.getUsers();
     }
@@ -92,8 +103,8 @@ public class AppDataManager implements DataManager {
     }
 
     @Override
-    public void queryForMessages() {
-        apiHelper.queryForMessages();
+    public void queryForMessages(String userId, String chatWithUserid) {
+        apiHelper.queryForMessages(userId, chatWithUserid);
     }
 
     @Override

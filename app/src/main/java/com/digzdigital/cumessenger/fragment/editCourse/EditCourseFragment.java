@@ -1,7 +1,6 @@
-package com.digzdigital.cumessenger.fragment.addCourse;
+package com.digzdigital.cumessenger.fragment.editCourse;
 
 import android.app.Fragment;
-import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,32 +11,30 @@ import android.widget.ArrayAdapter;
 
 import com.digzdigital.cumessenger.R;
 import com.digzdigital.cumessenger.activity.MainActivity;
-import com.digzdigital.cumessenger.data.db.DbHelper;
 import com.digzdigital.cumessenger.data.db.model.Course;
-import com.digzdigital.cumessenger.databinding.FragmentAddCourseBinding;
-import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
-import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
+import com.digzdigital.cumessenger.databinding.FragmentEditCourseBinding;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-public class AddCourseFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemSelectedListener {
+/**
+ * Created by Digz on 01/04/2017.
+ */
+
+public class EditCourseFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemSelectedListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-    private FragmentAddCourseBinding binding;
+    private Course course;
+    private FragmentEditCourseBinding binding;
     private Date startTime;
     private MainActivity mainActivity;
 
-    private Course course = new Course();
 
-    public AddCourseFragment() {
+    public EditCourseFragment() {
         // Required empty public constructor
     }
 
@@ -45,16 +42,14 @@ public class AddCourseFragment extends Fragment implements View.OnClickListener,
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
+     * @param course Parameter 1.
      * @return A new instance of fragment AddCourseFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static AddCourseFragment newInstance(String param1, String param2) {
-        AddCourseFragment fragment = new AddCourseFragment();
+    public static EditCourseFragment newInstance(Course course) {
+        EditCourseFragment fragment = new EditCourseFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putParcelable(ARG_PARAM1, course);
         fragment.setArguments(args);
         return fragment;
     }
@@ -63,8 +58,7 @@ public class AddCourseFragment extends Fragment implements View.OnClickListener,
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            course = getArguments().getParcelable(ARG_PARAM1);
         }
         mainActivity = (MainActivity) getActivity();
     }
@@ -73,18 +67,28 @@ public class AddCourseFragment extends Fragment implements View.OnClickListener,
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_add_course, container, false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_edit_course, container, false);
+        binding.deleteCourse.setOnClickListener(this);
         binding.save.setOnClickListener(this);
         binding.cancel.setOnClickListener(this);
-        // binding.courseStartTime.setOnClickListener(this);
         initDaySpinner();
         initTimeSpinner();
         initDurationSpinner();
+        updateUI();
         return binding.getRoot();
     }
 
+    private void updateUI() {
+        binding.courseCode.setText(course.getCourseCode());
+        binding.courseVenue.setText(course.getVenue());
+        binding.courseTitle.setText(course.getCourseTitle());
+        binding.daySelect.setSelection(course.getDay()+1);
+        binding.duration.setSelection(course.getDuration() - 1);
+        binding.courseStartTime.setSelection(course.getTime());
+    }
+
     private void initDaySpinner() {
-        String[] ITEMS = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday"};
+        String[] ITEMS = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, ITEMS);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         binding.daySelect.setAdapter(adapter);
@@ -131,13 +135,13 @@ public class AddCourseFragment extends Fragment implements View.OnClickListener,
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.save:
-                mainActivity.onSaveClicked(updateCourse());
+                mainActivity.onUpdateClicked(updateCourse());
                 break;
             case R.id.cancel:
                 mainActivity.onCancelClicked();
                 break;
-            case R.id.courseStartTime:
-                setTime("Set Start Time");
+            case R.id.deleteCourse:
+                mainActivity.deleteCourse(course);
                 break;
 
         }
@@ -158,7 +162,6 @@ public class AddCourseFragment extends Fragment implements View.OnClickListener,
         course.setCourseCode(binding.courseCode.getText().toString());
         course.setCourseTitle(binding.courseTitle.getText().toString());
         course.setVenue(binding.courseVenue.getText().toString());
-        // course.setDuration(Integer.parseInt(binding.duration.getText().toString()));
         return course;
     }
 
@@ -195,3 +198,4 @@ public class AddCourseFragment extends Fragment implements View.OnClickListener,
 
 
 }
+

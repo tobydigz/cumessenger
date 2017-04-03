@@ -99,11 +99,23 @@ public class User implements Parcelable{
     }
 
     public String getName() {
-        return firstName + " " + middleName + " " + lastName;
+        return firstName + " " + lastName;
     }
 
     public void setFirstName(String firstName) {
         this.firstName = firstName;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getMiddleName() {
+        return middleName;
     }
 
     public String getDateOfBirth() {
@@ -131,7 +143,7 @@ public class User implements Parcelable{
     }
 
     public String getGraduationYear() {
-        return "Class of " + graduationYear;
+        return "Class of "+graduationYear;
     }
 
     public void setGraduationYear(int graduationYear) {

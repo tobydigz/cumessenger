@@ -6,8 +6,11 @@ package com.digzdigital.cumessenger.data.messenger.model;
 
 public class OngoingMessage {
     private String id;
+    private String userId;
+    private String chatWithUserId;
     private String userName;
-    private String chatWithUsername;
+    private String chatWithUserName;
+
 
     public OngoingMessage() {
     }
@@ -20,6 +23,22 @@ public class OngoingMessage {
         this.id = id;
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getChatWithUserId() {
+        return chatWithUserId;
+    }
+
+    public void setChatWithUserId(String chatWithUserId) {
+        this.chatWithUserId = chatWithUserId;
+    }
+
     public String getUserName() {
         return userName;
     }
@@ -28,11 +47,11 @@ public class OngoingMessage {
         this.userName = userName;
     }
 
-    public String getChatWithUsername() {
-        return chatWithUsername;
+    public String getChatWithUserName() {
+        return chatWithUserName;
     }
 
-    public void setChatWithUsername(String chatWithUsername) {
-        this.chatWithUsername = chatWithUsername;
+    public void setChatWithUserName(String chatWithUserName) {
+        this.chatWithUserName = chatWithUserName;
     }
 }

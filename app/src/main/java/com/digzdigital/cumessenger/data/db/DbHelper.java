@@ -11,11 +11,12 @@ import java.util.ArrayList;
 
 public interface DbHelper {
 
-    void createCourse(Course course, String userId);
-    void queryForCourses();
+    String getUsername();
+    boolean createCourse(Course course, String userId);
+    ArrayList<Course> queryForCourses();
     ArrayList<Course> getAllCourses();
-    boolean deleteCourse(String  key);
-    boolean updateCourse(Course course);
+    boolean deleteCourse(Course course);
+    boolean updateCourse(Course course, String userId);
     // void queryForReminders();
     // ArrayList<ReminderItem> getOnlineReminders();
     ArrayList<RowObject> getRowObjects();
@@ -23,5 +24,6 @@ public interface DbHelper {
     void queryForUserInfo(String id);
     User getUserInfo();
     void queryForUsers(String userId);
+    void searchForUsers(String userId);
     ArrayList<User> getUsers();
 }

@@ -63,7 +63,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         String email = binding.email.getText().toString().trim();
         String password = binding.password.getText().toString().trim();
         String id = binding.matric.getText().toString().toUpperCase().trim();
-        if (!validateEmail(email) || !validatePassword(password) || validateId(id)) return;
+        if (!validateEmail(email) || !validatePassword(password) || !validateId(id)) return;
         binding.progressBar.setVisibility(View.VISIBLE);
         binding.signUpButton.setEnabled(false);
         this.email = email;

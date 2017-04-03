@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.digzdigital.cumessenger.R;
+import com.digzdigital.cumessenger.activity.MainActivity;
 import com.digzdigital.cumessenger.data.DataManager;
 import com.digzdigital.cumessenger.data.messenger.model.MessageObject;
 import com.digzdigital.cumessenger.databinding.ActivityChatBinding;
@@ -22,30 +23,27 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 
-import javax.inject.Inject;
-
 public class ChatFragment extends Fragment implements View.OnClickListener {
 
     private static final String ARG_PARAM_1 = "param1";
     private static final String ARG_PARAM_2 = "param2";
     private static final String ARG_PARAM_3 = "param3";
-    @Inject
     public DataManager dataManager;
     private ActivityChatBinding binding;
     private ArrayList<MessageObject> messages;
     private String username;
-    private String chatWithUsername;
+    private String chatWithUserid;
     private String uid;
 
     public ChatFragment() {
 
     }
 
-    public static Fragment newInstance(String username, String chatWithUsername, String uid) {
+    public static Fragment newInstance(String username, String chatWithUserid, String uid) {
         ChatFragment fragment = new ChatFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM_1, username);
-        args.putString(ARG_PARAM_2, chatWithUsername);
+        args.putString(ARG_PARAM_2, chatWithUserid);
         args.putString(ARG_PARAM_3, uid);
         fragment.setArguments(args);
         return fragment;
@@ -54,9 +52,11 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MainActivity activity = (MainActivity)getActivity();
+        dataManager = activity.getDataManager();
         if (getArguments() != null) {
             username = getArguments().getString(ARG_PARAM_1);
-            chatWithUsername = getArguments().getString(ARG_PARAM_2);
+            chatWithUserid = getArguments().getString(ARG_PARAM_2);
             uid = getArguments().getString(ARG_PARAM_3);
         }
 
@@ -67,7 +67,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.activity_chat, container, false);
         binding.sendButton.setOnClickListener(this);
-        dataManager.queryForMessages();
+        dataManager.queryForMessages(uid, chatWithUserid);
         return binding.getRoot();
     }
 
@@ -82,7 +82,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
     }
 
     private void sendMessage() {
-        dataManager.setChatUsers(username, chatWithUsername);
+        dataManager.setChatUsers(uid, chatWithUserid);
         String messageText = binding.messageArea.getText().toString();
         if (!messageText.isEmpty()) {
             MessageObject messageObject = new MessageObject();
@@ -127,11 +127,13 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onStart() {
+        super.onStart();
         EventBus.getDefault().register(this);
     }
 
     @Override
     public void onStop() {
+        super.onStop();
         EventBus.getDefault().unregister(this);
     }
 

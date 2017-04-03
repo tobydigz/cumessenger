@@ -2,6 +2,7 @@ package com.digzdigital.cumessenger.activity;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -15,33 +16,42 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
+import com.digzdigital.cumessenger.MessengerApplication;
 import com.digzdigital.cumessenger.R;
-import com.digzdigital.cumessenger.data.db.DbHelper;
+import com.digzdigital.cumessenger.data.DataManager;
 import com.digzdigital.cumessenger.data.db.model.Course;
 import com.digzdigital.cumessenger.data.db.model.User;
+import com.digzdigital.cumessenger.data.messenger.model.Forum;
 import com.digzdigital.cumessenger.data.messenger.model.OngoingMessage;
 import com.digzdigital.cumessenger.fragment.addCourse.AddCourseFragment;
 import com.digzdigital.cumessenger.fragment.editProfile.EditFragment;
+import com.digzdigital.cumessenger.fragment.forum.forumMessages.ForumMessagesFragment;
+import com.digzdigital.cumessenger.fragment.forum.forumselect.ForumFragment;
 import com.digzdigital.cumessenger.fragment.manageCourse.ManageCoursesFragment;
 import com.digzdigital.cumessenger.fragment.messaging.chat.ChatFragment;
 import com.digzdigital.cumessenger.fragment.messaging.ongoing.OngoingMessagesListFragment;
 import com.digzdigital.cumessenger.fragment.messaging.user.UsersFragment;
 import com.digzdigital.cumessenger.fragment.profile.ProfileFragment;
 import com.digzdigital.cumessenger.fragment.timetable.TimetableFragment;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, ProfileFragment.ProfileFragmentListener, EditFragment.EditFragmentListener, AddCourseFragment.OnFragmentInteractionListener, ManageCoursesFragment.OnFragmentInteractionListener, UsersFragment.OnFragmentInteractionListener, TimetableFragment.OnFragmentInteractionListener, OngoingMessagesListFragment.OnFragmentInteractionListener {
+import javax.inject.Inject;
 
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, ProfileFragment.ProfileFragmentListener, EditFragment.EditFragmentListener, OngoingMessagesListFragment.OnFragmentInteractionListener {
+
+    @Inject
+    public DataManager dataManager;
     private FirebaseAuth auth;
     private FirebaseUser firebaseUser;
     private Fragment profileFragment, editFragment, addCourseFragment, manageCourseFragment, usersFragment, timetableFragment;
     private FragmentManager fragmentManager;
-    private DbHelper dbHelper;
     private AuthStateListener listener = new AuthStateListener() {
         @Override
         public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -51,6 +61,9 @@ public class MainActivity extends AppCompatActivity
                 loadDetails();
             } else {
                 //Nigga signed out
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
             }
 
         }
@@ -78,22 +91,22 @@ public class MainActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-
+        ((MessengerApplication) getApplication()).getAppComponent().inject(this);
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         fragmentManager = getFragmentManager();
         auth = FirebaseAuth.getInstance();
         auth.addAuthStateListener(listener);
-        //// TODO: 25/02/2017 start Fragment based on signed in user
 
     }
 
     private void loadDetails() {
-        if (getIntent() != null) {
+        if (getIntent().getStringExtra("id") != null) {
             String id = getIntent().getStringExtra("id");
             User user = new User();
             user.setId(id);
-            user.setUid(firebaseUser.getEmail());
+            user.setUid(firebaseUser.getUid());
+            user.setEmail(firebaseUser.getEmail());
             switchFragment(createEditFragment(user));
         } else {
             switchFragment(getProfileFragment());
@@ -141,15 +154,17 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_profile) {
             switchFragment(getProfileFragment());
         } else if (id == R.id.nav_courses) {
-
+            switchFragment(createCoursesFragment());
         } else if (id == R.id.nav_forum) {
-
+            switchFragment(createForumFragment());
         } else if (id == R.id.nav_messaging) {
-
+            switchFragment(createOngoingMessagesFragment());
         } else if (id == R.id.nav_signout) {
-
-        }else if (id == R.id.nav_people) {
-
+            auth.signOut();
+        } else if (id == R.id.nav_people) {
+            switchFragment(createUsersFragment());
+        }else if (id == R.id.nav_timetable) {
+            switchFragment(createTimeTableFragment());
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -173,7 +188,7 @@ public class MainActivity extends AppCompatActivity
         switchFragment(createEditFragment(user));
     }
 
-    private void switchFragment(Fragment fragment) {
+    public void switchFragment(Fragment fragment) {
         fragmentManager.beginTransaction()
                 .replace(R.id.content_main, fragment)
                 .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
@@ -185,12 +200,27 @@ public class MainActivity extends AppCompatActivity
         return EditFragment.newInstance(user);
     }
 
-    private Fragment createChatFragment(String username, String chatWithUsername, String uid) {
-        return ChatFragment.newInstance(username, chatWithUsername, uid);
+    private Fragment createChatFragment( String chatWithUserid, String uid) {
+        return ChatFragment.newInstance(firebaseUser.getEmail(), chatWithUserid, uid);
+    }
+    private Fragment createTimeTableFragment() {
+        return TimetableFragment.newInstance("", "");
     }
 
     private Fragment createUsersFragment() {
-        return UsersFragment.newInstance("", "");
+        return UsersFragment.newInstance(firebaseUser.getUid(), "");
+    }
+
+    private Fragment createCoursesFragment() {
+        return ManageCoursesFragment.newInstance(firebaseUser.getUid(), "");
+    }
+
+    private Fragment createOngoingMessagesFragment() {
+        return OngoingMessagesListFragment.newInstance(firebaseUser.getUid());
+    }
+
+    private Fragment createForumFragment() {
+        return ForumFragment.newInstance("", "");
     }
 
     private Fragment getProfileFragment() {
@@ -200,33 +230,92 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onSaveChanges(String name) {
-        //todo updateFirebaseUser
+    public void onSaveChanges(User user) {
+        updateFirebaseUser(user);
         switchFragment(getProfileFragment());
     }
 
-    @Override
-    public void onCancelClicked() {
+    private void updateFirebaseUser(User user) {
+        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                .setDisplayName(user.getName())
+                .build();
 
+        firebaseUser.updateProfile(profileUpdates)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+
+                    }
+                });
     }
 
-    @Override
     public void onSaveClicked(Course course) {
-        dbHelper.createCourse(course, firebaseUser.getUid());
+        if (dataManager.createCourse(course, firebaseUser.getUid()))
+            switchFragmentNoStack(getCourseFragment());
+        else showError();
+
     }
 
-    @Override
+    public void onCancelClicked() {
+        switchFragmentNoStack(getCourseFragment());
+
+    }
+    private void showError() {
+        Toast.makeText(this, "Course not saved", Toast.LENGTH_LONG).show();
+    }
+
+    public void onUpdateClicked(Course course) {
+        dataManager.updateCourse(course, "");
+        switchFragmentNoStack(getCourseFragment());
+
+    }
+
+    public void addNewCourse() {
+        switchFragmentNoStack(getAddCourseFragment());
+    }
+
+    public void deleteCourse(Course course) {
+        dataManager.deleteCourse(course);
+        switchFragmentNoStack(getCourseFragment());
+    }
+
+    private Fragment getCourseFragment() {
+        return ManageCoursesFragment.newInstance(firebaseUser.getUid(), "");
+    }
+
+    private Fragment getAddCourseFragment() {
+        return AddCourseFragment.newInstance(firebaseUser.getUid(), "");
+    }
+
     public void onCourseClicked(Course course) {
 
     }
 
-    @Override
     public void onUserClicked(String username) {
-        switchFragment(createChatFragment(firebaseUser.getUid(), username, firebaseUser.getUid()));
+        switchFragment(createChatFragment(username, firebaseUser.getUid()));
     }
 
     @Override
     public void onOngoingMessageClicked(OngoingMessage ongoingMessage) {
-        createChatFragment(ongoingMessage.getUserName(), ongoingMessage.getChatWithUsername(), firebaseUser.getUid());
+        createChatFragment(ongoingMessage.getChatWithUserId(), firebaseUser.getUid());
+    }
+
+    public DataManager getDataManager() {
+        return dataManager;
+    }
+
+    public void onForumClicked(Forum forum) {
+        switchFragment(getForumFragment(forum));
+    }
+
+    private Fragment getForumFragment(Forum forum) {
+        return ForumMessagesFragment.newInstance(forum);
+    }
+
+    private void switchFragmentNoStack(Fragment fragment) {
+        fragmentManager.beginTransaction()
+                .replace(R.id.content_main, fragment)
+                .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
+                .commit();
     }
 }

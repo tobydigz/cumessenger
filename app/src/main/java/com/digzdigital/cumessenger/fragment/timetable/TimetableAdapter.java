@@ -1,7 +1,7 @@
 package com.digzdigital.cumessenger.fragment.timetable;
 
 import android.content.Context;
-import android.media.Image;
+import android.graphics.Color;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -16,62 +16,168 @@ import java.util.ArrayList;
 
 import de.codecrafters.tableview.TableDataAdapter;
 
-/**
- * Created by Digz on 28/02/2017.
- */
 
-public class TimetableAdapter extends TableDataAdapter<RowObject> {
+class TimetableAdapter extends TableDataAdapter<RowObject> {
 
-    private Context context;
-    public TimetableAdapter(Context context, ArrayList<RowObject> rowObjects){
+    TimetableAdapter(Context context, ArrayList<RowObject> rowObjects) {
         super(context, rowObjects);
     }
+
     @Override
     public View getCellView(int rowIndex, int columnIndex, ViewGroup parentView) {
         RowObject rowObject = getRowData(rowIndex);
         View renderedView = null;
-        switch (columnIndex){
+        Course course;
+        switch (columnIndex) {
+
             case 0:
                 TextView textView = new TextView(getContext());
                 textView.setText(rowObject.getRowHeader());
                 renderedView = textView;
                 break;
             case 1:
-                renderedView = createImageView(rowObject.getCourses().get(0));
+                try {
+                    if (rowObject.getCourses().get(0) != null) {
+                        course = rowObject.getCourses().get(0);
+                        renderedView = createImageView(course);
+                    } else {
+                        course = new Course();
+                        course.setCourseCode("");
+                        renderedView = (createImageView(course));
+                    }
+                } catch (Exception ignore) {
+                    course = new Course();
+                    course.setCourseCode("");
+                    renderedView = (createImageView(course));
+                }
                 break;
             case 2:
-                renderedView = createImageView(rowObject.getCourses().get(1));
+                try {
+                    if (rowObject.getCourses().get(1) != null) {
+                        course = rowObject.getCourses().get(1);
+                        renderedView = createImageView(course);
+                    } else {
+                        course = new Course();
+                        course.setCourseCode("");
+
+                        renderedView = (createImageView(course));
+                    }
+
+                } catch (Exception ignore) {
+                    course = new Course();
+                    course.setCourseCode("");
+                    renderedView = (createImageView(course));
+                }
                 break;
             case 3:
-                renderedView = createImageView(rowObject.getCourses().get(2));
+                try {
+                    if (rowObject.getCourses().get(2) != null) {
+                        course = rowObject.getCourses().get(2);
+                        renderedView = createImageView(course);
+                    } else {
+                        course = new Course();
+                        course.setCourseCode("");
+                        renderedView = (createImageView(course));
+                    }
+
+                } catch (Exception ignore) {
+                    course = new Course();
+                    course.setCourseCode("");
+                    renderedView = (createImageView(course));
+                }
                 break;
             case 4:
-                renderedView = createImageView(rowObject.getCourses().get(3));
+                try {
+                    if (rowObject.getCourses().get(3) != null) {
+                        course = rowObject.getCourses().get(3);
+                        renderedView = createImageView(course);
+                    } else {
+                        course = new Course();
+                        course.setCourseCode("");
+                        renderedView = (createImageView(course));
+                    }
+
+                } catch (Exception ignore) {
+                    course = new Course();
+                    course.setCourseCode("");
+                    renderedView = (createImageView(course));
+                }
                 break;
             case 5:
-                renderedView = createImageView(rowObject.getCourses().get(4));
+                try {
+                    if (rowObject.getCourses().get(4) != null) {
+                        course = rowObject.getCourses().get(4);
+                        renderedView = createImageView(course);
+                    } else {
+                        course = new Course();
+                        course.setCourseCode("");
+                        renderedView = (createImageView(course));
+                    }
+
+                } catch (Exception ignore) {
+                    course = new Course();
+                    course.setCourseCode("");
+                    renderedView = (createImageView(course));
+                }
                 break;
             case 6:
-                renderedView = createImageView(rowObject.getCourses().get(5));
+                try {
+                    if (rowObject.getCourses().get(5) != null) {
+                        course = rowObject.getCourses().get(5);
+                        renderedView = createImageView(course);
+                    } else {
+                        course = new Course();
+                        course.setCourseCode("");
+                        renderedView = (createImageView(course));
+                    }
+
+                } catch (Exception ignore) {
+                    course = new Course();
+                    course.setCourseCode("");
+                    renderedView = (createImageView(course));
+                }
                 break;
             case 7:
-                renderedView = createImageView(rowObject.getCourses().get(6));
+                try {
+                    if (rowObject.getCourses().get(6) != null) {
+                        course = rowObject.getCourses().get(6);
+                        renderedView = createImageView(course);
+                    } else {
+                        course = new Course();
+                        course.setCourseCode("");
+                        renderedView = (createImageView(course));
+                    }
+
+                } catch (Exception ignore) {
+                    course = new Course();
+                    course.setCourseCode("");
+                    renderedView = (createImageView(course));
+                }
                 break;
         }
         return renderedView;
     }
 
-    private ImageView createImageView(Course course){
+    private ImageView createImageView(Course course) {
+
         ImageView imageView = new ImageView(getContext());
-        imageView.setImageDrawable(createDrawable(course.getCourseTitle()));
+        String name = course.getCourseCode();
+
+        if (name != null) imageView.setImageDrawable(createDrawable(name));
+        else imageView.setImageDrawable(createDrawable(""));
+
         return imageView;
     }
-    private TextDrawable createDrawable(String name){
+
+    private TextDrawable createDrawable(String name) {
         ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
-        int color1 = generator.getRandomColor();
+
+        int color1 = generator.getColor(name);
         TextDrawable.IBuilder builder = TextDrawable.builder()
                 .beginConfig()
-                .width(60)
+                .textColor(Color.BLACK)
+                .toUpperCase()
+                .width(100)
                 .height(60)
                 .withBorder(4)
                 .endConfig()

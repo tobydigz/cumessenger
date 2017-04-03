@@ -1,30 +1,65 @@
 package com.digzdigital.cumessenger.data.db.model;
 
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import com.orm.SugarRecord;
+
 import java.util.Date;
 
 // import io.realm.RealmObject;
 
-public class Course/* extends RealmObject*/{
+public class Course extends SugarRecord implements Parcelable{
 
-    private String id;
+    private Long id;
     private String courseCode;
     private String courseTitle;
     private String venue;
     private int day;
-    private Date startTime;
-    private Date endTime;
-    private int size;
+    private int time;
+    private int duration;
 
     public Course() {
+
     }
 
-    public String  getId() {
-        return id;
+
+    public Course(Parcel in){
+        this.courseCode = in.readString();
+        this.courseTitle = in.readString();
+        this.venue = in.readString();
+        this.day = in.readInt();
+        this.time = in.readInt();
+        this.duration = in.readInt();
     }
 
-    public void setId(String id) {
-        this.id = id;
+    @Override
+    public void writeToParcel(Parcel parcel, int i){
+        parcel.writeString(courseCode);
+        parcel.writeString(courseTitle);
+        parcel.writeString(venue);
+        parcel.writeInt(day);
+        parcel.writeInt(time);
+        parcel.writeInt(duration);
+    }
+
+
+    public static final Parcelable.Creator<Course> CREATOR = new Parcelable.Creator<Course>(){
+        @Override
+        public Course createFromParcel(Parcel parcel){
+            return new Course(parcel);
+        }
+
+        @Override
+        public Course[] newArray(int size) {
+            return new Course[size];
+        }
+    };
+
+    @Override
+    public int describeContents(){
+        return hashCode();
     }
 
     public String getCourseCode() {
@@ -51,7 +86,10 @@ public class Course/* extends RealmObject*/{
         this.venue = venue;
     }
 
-    public String getDay() {
+    public Integer getDay(){
+        return day;
+    }
+    public String getDayText() {
         String dayOfWeek ="";
         switch (day){
             case 0:
@@ -75,6 +113,9 @@ public class Course/* extends RealmObject*/{
             case 6:
                 dayOfWeek = "Sunday";
                 break;
+            default:
+                dayOfWeek ="lol";
+                break;
         }
         return dayOfWeek;
     }
@@ -87,27 +128,71 @@ public class Course/* extends RealmObject*/{
         this.day = day;
     }
 
-    public Date getStartTime() {
-        return startTime;
+    public int getDuration() {
+        return duration;
     }
 
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
+    public void setDuration(long duration) {
+        this.duration = (int) duration;
     }
 
-    public Date getEndTime() {
-        return endTime;
+    public Integer getTime() {
+        return time;
     }
 
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
+    public String getStartTime(){
+        String header = "";
+        switch (time) {
+            case 1:
+                header = "8:00";
+                break;
+            case 2:
+                header = "9:00";
+                break;
+            case 3:
+                header = "10:00";
+                break;
+            case 4:
+                header = "11:00";
+                break;
+            case 5:
+                header = "12:00";
+                break;
+            case 6:
+                header = "13:00";
+                break;
+            case 7:
+                header = "14:00";
+                break;
+            case 8:
+                header = "15:00";
+                break;
+            case 9:
+                header = "16:00";
+                break;
+            case 10:
+                header = "17:00";
+                break;
+            case 11:
+                header = "18:00";
+                break;
+            case 12:
+                header = "19:00";
+                break;
+        }
+        return header;
+
     }
 
-    public int getSize() {
-        return size;
+    public void setTime(int time) {
+        this.time = time;
     }
 
-    public void setSize(int size) {
-        this.size = size;
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

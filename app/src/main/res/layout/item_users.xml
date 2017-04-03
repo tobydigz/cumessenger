@@ -34,15 +34,16 @@
                 android:layout_height="wrap_content"
                 android:text="John Doe"
                 android:textSize="25sp"
+                android:layout_gravity="center_vertical"
                 android:textStyle="bold"
                 tools:ignore="HardcodedText"/>
 
-            <TextView
+            <!--<TextView
                 android:id="@+id/userId"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="11CK012419"
-                tools:ignore="HardcodedText"/>
+                tools:ignore="HardcodedText"/>-->
         </LinearLayout>
     </LinearLayout>
 

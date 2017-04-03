@@ -10,12 +10,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.digzdigital.cumessenger.R;
+import com.digzdigital.cumessenger.activity.MainActivity;
 import com.digzdigital.cumessenger.data.DataManager;
 import com.digzdigital.cumessenger.data.messenger.model.Forum;
 import com.digzdigital.cumessenger.data.messenger.model.MessageObject;
 import com.digzdigital.cumessenger.databinding.FragmentForumMessagesBinding;
 import com.digzdigital.cumessenger.eventbus.EventType;
 import com.digzdigital.cumessenger.eventbus.FirebaseEvent;
+import com.google.firebase.auth.FirebaseAuth;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -33,7 +35,7 @@ import javax.inject.Inject;
  * Use the {@link ForumMessagesFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ForumMessagesFragment extends Fragment {
+public class ForumMessagesFragment extends Fragment implements View.OnClickListener{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -41,12 +43,11 @@ public class ForumMessagesFragment extends Fragment {
 
     // TODO: Rename and change types of parameters
     private Forum forum;
-
-    @Inject
     public DataManager dataManager;
     private FragmentForumMessagesBinding binding;
     private OnFragmentInteractionListener listener;
     private ArrayList<MessageObject> forumMessages;
+    private String userId, email;
 
     public ForumMessagesFragment() {
         // Required empty public constructor
@@ -71,9 +72,13 @@ public class ForumMessagesFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MainActivity activity = (MainActivity)getActivity();
+        dataManager = activity.getDataManager();
         if (getArguments() != null) {
             forum = getArguments().getParcelable(ARG_PARAM1);
         }
+        userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
     }
 
     @Override
@@ -81,26 +86,14 @@ public class ForumMessagesFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_forum_messages, container, false);
+        binding.sendButton.setOnClickListener(this);
         dataManager.queryForForumMessages(forum.getId());
         return binding.getRoot();
     }
 
-
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            listener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        listener = null;
+    public void onClick(View v) {
+        sendMessage();
     }
 
     /**
@@ -156,4 +149,18 @@ public class ForumMessagesFragment extends Fragment {
             }
         }
     }
+
+    private void sendMessage() {
+        String messageText = binding.messageArea.getText().toString();
+        if (!messageText.isEmpty()) {
+            MessageObject messageObject = new MessageObject();
+            messageObject.setMessage(messageText);
+            messageObject.setUserName(email);
+            messageObject.setUid(userId);
+            dataManager.postForumMessage(messageObject, forum.getId());
+        }
+    }
+
+
+
 }

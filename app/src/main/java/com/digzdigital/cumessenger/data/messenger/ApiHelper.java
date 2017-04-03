@@ -12,7 +12,7 @@ public interface ApiHelper {
 
     void setChatUsers(String username, String chatWithUsername);
     void SendMessage(MessageObject messageObject);
-    void queryForMessages();
+    void queryForMessages(String userid, String chatWithUserid);
     void queryForNewMessage();
     ArrayList<MessageObject> getMessages();
     MessageObject getNewMessage();

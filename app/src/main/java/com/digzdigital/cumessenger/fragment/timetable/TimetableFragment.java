@@ -1,7 +1,6 @@
 package com.digzdigital.cumessenger.fragment.timetable;
 
 import android.app.Fragment;
-import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.digzdigital.cumessenger.R;
+import com.digzdigital.cumessenger.activity.MainActivity;
 import com.digzdigital.cumessenger.data.DataManager;
 import com.digzdigital.cumessenger.data.db.model.RowObject;
 import com.digzdigital.cumessenger.databinding.FragmentTimetableBinding;
@@ -22,7 +22,6 @@ import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link TimetableFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
  * Use the {@link TimetableFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -32,12 +31,11 @@ public class TimetableFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static final String[] HEADER_DATA = {"", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+    private static final String[] HEADER_DATA = {"", "MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"};
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
     private FragmentTimetableBinding binding;
-    private OnFragmentInteractionListener listener;
     private ArrayList<RowObject> rowObjects;
     private DataManager dataManager;
 
@@ -54,7 +52,7 @@ public class TimetableFragment extends Fragment {
      * @return A new instance of fragment TimetableFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static Fragment newInstance(String param1, String param2) {
+    public static TimetableFragment newInstance(String param1, String param2) {
         TimetableFragment fragment = new TimetableFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
@@ -70,6 +68,8 @@ public class TimetableFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        MainActivity activity = (MainActivity)getActivity();
+        dataManager = activity.getDataManager();
     }
 
     @Override
@@ -85,6 +85,7 @@ public class TimetableFragment extends Fragment {
         TableColumnDpWidthModel columnModel = new TableColumnDpWidthModel(getActivity(), 8);
         binding.tableView.setColumnModel(columnModel);
         binding.tableView.setHeaderAdapter(new SimpleTableHeaderAdapter(getActivity(), HEADER_DATA));
+        loadTableRowItems();
     }
 
     private void loadTableRowItems() {
@@ -92,36 +93,5 @@ public class TimetableFragment extends Fragment {
         if (rowObjects != null && rowObjects.size() > 0) {
             binding.tableView.setDataAdapter(new TimetableAdapter(getActivity(), rowObjects));
         }
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            listener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        listener = null;
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
     }
 }
