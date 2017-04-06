@@ -157,6 +157,7 @@ public class ForumMessagesFragment extends Fragment implements View.OnClickListe
             messageObject.setMessage(messageText);
             messageObject.setUserName(email);
             messageObject.setUid(userId);
+            messageObject.setChatWithUserName("");
             dataManager.postForumMessage(messageObject, forum.getId());
         }
     }

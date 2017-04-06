@@ -157,9 +157,11 @@ public class AppDbHelper implements DbHelper {
                     User user = new User();
                     String firstName = (String)snapshot.child("firstName").getValue();
                     String lastName = (String)snapshot.child("lastName").getValue();
+                    String email = (String)snapshot.child("email").getValue();
                     String id = (String)snapshot.child("id").getValue();
                     user.setFirstName(firstName);
                     user.setLastName(lastName);
+                    user.setEmail(email);
                     user.setId(id);
                     users.add(user);
                 }

@@ -41,8 +41,11 @@ public class AppApiHelper implements ApiHelper {
 
     @Override
     public void SendMessage(MessageObject messageObject) {
-        databaseReference.child("messages").child(username).child(chatWithUsername).push().setValue(messageObject);
-        databaseReference.child("messages").child(chatWithUsername).child(username).push().setValue(messageObject);
+        String key = databaseReference.child("messages").child(username).child(chatWithUsername).push().getKey();
+        databaseReference.child("messages").child(username).child(chatWithUsername).child(key).setValue(messageObject);
+        databaseReference.child("messages").child(username).child(chatWithUsername).child("email").setValue(messageObject.getChatWithUserName());
+        databaseReference.child("messages").child(chatWithUsername).child(username).child(key).setValue(messageObject);
+        databaseReference.child("messages").child(chatWithUsername).child(username).child("email").setValue(messageObject.getUserName());
     }
 
     @Override
@@ -142,7 +145,11 @@ public class AppApiHelper implements ApiHelper {
                 forumMessages = null;
                 forumMessages = new ArrayList<>();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    MessageObject messageObject = snapshot.getValue(MessageObject.class);
+                    MessageObject messageObject = new MessageObject();
+                    messageObject.setMessage((String)snapshot.child("message").getValue());
+                    messageObject.setUserName((String)snapshot.child("userName").getValue());
+                    messageObject.setUid((String)snapshot.child("uid").getValue());
+
                     forumMessages.add(messageObject);
                 }
                 postEvent(EventType.FORUM_MESSAGES);
@@ -170,12 +177,13 @@ public class AppApiHelper implements ApiHelper {
         databaseReference.child("messages").child(userid).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                OngoingMessage ongoingMessage = new OngoingMessage();
+
                 for (DataSnapshot snapshot: dataSnapshot.getChildren()){
-                    OngoingMessage ongoingMessage = new OngoingMessage();
                     ongoingMessage.setUserId(userid);
+                    ongoingMessage.setUserName((String)dataSnapshot.child("email").getValue());
                     ongoingMessage.setChatWithUserId(snapshot.getKey());
-                    ongoingMessage.setUserName((String)snapshot.child("userName").getValue());
-                    ongoingMessage.setChatWithUserName((String)snapshot.child("chatWithUserName").getValue());
+                    ongoingMessage.setChatWithUserName((String)snapshot.child("email").getValue());
                     ongoingMessages.add(ongoingMessage);
                 }
                 postEvent(EventType.ONGOING_MESSAGES);

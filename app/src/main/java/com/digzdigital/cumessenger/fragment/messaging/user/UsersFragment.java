@@ -107,7 +107,8 @@ dataManager.queryForUsers(userId);
                     @Override
                     public void onItemClick(int position, View v) {
                         String username = users.get(position).getUid();
-                        activity.onUserClicked(username);
+                        String email = users.get(position).getEmail();
+                        activity.onUserClicked(username, email);
                     }
                 });
             }

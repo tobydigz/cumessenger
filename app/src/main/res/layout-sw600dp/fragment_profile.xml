@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -18,7 +19,7 @@
 
                 <ImageView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="260dp"
                     android:scaleType="centerCrop"
                     android:src="@mipmap/profile_background_new"/>
 
@@ -36,7 +37,8 @@
                         android:layout_height="wrap_content"
                         android:padding="2dp"
                         android:text="John Doe"
-                        android:textColor="@color/white"/>
+                        android:textColor="@color/white"
+                        android:textSize="24sp"/>
 
                     <TextView
                         android:id="@+id/profileId"
@@ -45,7 +47,9 @@
                         android:layout_height="wrap_content"
                         android:padding="2dp"
                         android:text="11CK012419"
-                        android:textColor="@color/white"/>
+                        android:textColor="@color/white"
+                        android:textSize="22sp"/>
+
                     <TextView
                         android:id="@+id/profileYear"
                         style="@style/TextAppearance.AppCompat.Caption"
@@ -53,17 +57,19 @@
                         android:layout_height="wrap_content"
                         android:padding="2dp"
                         android:text="Class of 2018"
-                        android:textColor="@color/white"/>
+                        android:textColor="@color/white"
+                        android:textSize="22sp"/>
                 </LinearLayout>
-<ImageButton
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:src="@drawable/ic_info_black_24dp"
-    android:tint="@color/white"
-    android:id="@+id/editProfile"
-    android:layout_gravity="end"
-    android:layout_margin="8dp"
-    android:background="?attr/selectableItemBackgroundBorderless"/>
+
+                <ImageButton
+                    android:id="@+id/editProfile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_margin="8dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_info_black_24dp"
+                    android:tint="@color/white"/>
             </FrameLayout>
 
 
@@ -89,13 +95,15 @@
                         style="@style/TextAppearance.AppCompat.Body1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Alumni"/>
+                        android:text="Alumni"
+                        android:textSize="24sp"/>
 
                     <TextView
                         style="@style/TextAppearance.AppCompat.Caption"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Status"/>
+                        android:text="Status"
+                        android:textSize="20sp"/>
 
 
                 </LinearLayout>
@@ -112,13 +120,15 @@
                         style="@style/TextAppearance.AppCompat.Body1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Computer Science"/>
+                        android:text="Computer Science"
+                        android:textSize="24sp"/>
 
                     <TextView
                         style="@style/TextAppearance.AppCompat.Caption"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Programme"/>
+                        android:text="Programme"
+                        android:textSize="20sp"/>
 
 
                 </LinearLayout>
@@ -135,13 +145,15 @@
                         style="@style/TextAppearance.AppCompat.Body1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Computer Management and Information Systems"/>
+                        android:text="Computer Management and Information Systems"
+                        android:textSize="24sp"/>
 
                     <TextView
                         style="@style/TextAppearance.AppCompat.Caption"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Department"/>
+                        android:text="Department"
+                        android:textSize="20sp"/>
 
 
                 </LinearLayout>
@@ -158,13 +170,15 @@
                         style="@style/TextAppearance.AppCompat.Body1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="4th October"/>
+                        android:text="4th October"
+                        android:textSize="24sp"/>
 
                     <TextView
                         style="@style/TextAppearance.AppCompat.Caption"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Date of Birth"/>
+                        android:text="Date of Birth"
+                        android:textSize="20sp"/>
 
 
                 </LinearLayout>
@@ -181,13 +195,15 @@
                         style="@style/TextAppearance.AppCompat.Body1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="johndoe@gmail.com"/>
+                        android:text="johndoe@gmail.com"
+                        android:textSize="24sp"/>
 
                     <TextView
                         style="@style/TextAppearance.AppCompat.Caption"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Email"/>
+                        android:text="Email"
+                        android:textSize="20sp"/>
 
 
                 </LinearLayout>
@@ -204,13 +220,15 @@
                         style="@style/TextAppearance.AppCompat.Body1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="+234 809 204 9313"/>
+                        android:text="+234 809 204 9313"
+                        android:textSize="24sp"/>
 
                     <TextView
                         style="@style/TextAppearance.AppCompat.Caption"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Phone"/>
+                        android:text="Phone"
+                        android:textSize="20sp"/>
 
 
                 </LinearLayout>

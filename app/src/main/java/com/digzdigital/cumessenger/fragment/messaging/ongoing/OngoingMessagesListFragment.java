@@ -43,7 +43,7 @@ public class OngoingMessagesListFragment extends Fragment {
     private FragmentMessagesListBinding binding;
     public DataManager dataManager;
     private ArrayList<OngoingMessage> ongoingMessages;
-
+private MainActivity activity;
     private OnFragmentInteractionListener listener;
 
     public OngoingMessagesListFragment() {
@@ -69,7 +69,7 @@ public class OngoingMessagesListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        MainActivity activity = (MainActivity)getActivity();
+        activity = (MainActivity)getActivity();
         dataManager = activity.getDataManager();
         if (getArguments() != null) {
             userid = getArguments().getString(ARG_PARAM1);
@@ -140,7 +140,7 @@ public class OngoingMessagesListFragment extends Fragment {
                     @Override
                     public void onItemClick(int position, View v) {
                         OngoingMessage ongoingMessage = ongoingMessages.get(position);
-                        listener.onOngoingMessageClicked(ongoingMessage);
+                        activity.onOngoingMessageClicked(ongoingMessage);
                     }
                 });
             }

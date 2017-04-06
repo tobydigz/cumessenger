@@ -6,8 +6,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.digzdigital.cumessenger.R;
 import com.digzdigital.cumessenger.activity.MainActivity;
@@ -23,28 +21,34 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 
-public class ChatFragment extends Fragment implements View.OnClickListener {
+import co.intentservice.chatui.ChatView;
+import co.intentservice.chatui.models.ChatMessage;
+
+public class ChatFragment extends Fragment implements ChatView.OnSentMessageListener {
 
     private static final String ARG_PARAM_1 = "param1";
     private static final String ARG_PARAM_2 = "param2";
     private static final String ARG_PARAM_3 = "param3";
+    private static final String ARG_PARAM_4 = "param4";
     public DataManager dataManager;
     private ActivityChatBinding binding;
     private ArrayList<MessageObject> messages;
     private String username;
     private String chatWithUserid;
     private String uid;
+    private String email;
 
     public ChatFragment() {
 
     }
 
-    public static Fragment newInstance(String username, String chatWithUserid, String uid) {
+    public static Fragment newInstance(String username, String chatWithUserid, String uid, String email) {
         ChatFragment fragment = new ChatFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM_1, username);
         args.putString(ARG_PARAM_2, chatWithUserid);
         args.putString(ARG_PARAM_3, uid);
+        args.putString(ARG_PARAM_4, email);
         fragment.setArguments(args);
         return fragment;
     }
@@ -52,7 +56,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        MainActivity activity = (MainActivity)getActivity();
+        MainActivity activity = (MainActivity) getActivity();
         dataManager = activity.getDataManager();
         if (getArguments() != null) {
             username = getArguments().getString(ARG_PARAM_1);
@@ -66,29 +70,21 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.activity_chat, container, false);
-        binding.sendButton.setOnClickListener(this);
         dataManager.queryForMessages(uid, chatWithUserid);
+        binding.chatView.setOnSentMessageListener(this);
         return binding.getRoot();
     }
 
-    @Override
-    public void onClick(View v) {
-
-        switch (v.getId()) {
-            case R.id.sendButton:
-                sendMessage();
-                break;
-        }
-    }
-
-    private void sendMessage() {
+    private void prepSendMessage(ChatMessage message) {
         dataManager.setChatUsers(uid, chatWithUserid);
-        String messageText = binding.messageArea.getText().toString();
+        String messageText = message.getMessage();
         if (!messageText.isEmpty()) {
             MessageObject messageObject = new MessageObject();
             messageObject.setMessage(messageText);
             messageObject.setUserName(username);
             messageObject.setUid(uid);
+            messageObject.setChatWithUserName(email);
+            messageObject.setDate(message.getTimestamp());
             dataManager.SendMessage(messageObject);
         }
     }
@@ -106,23 +102,17 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
     }
 
     private void addMessageBox(MessageObject message) {
-        TextView textView = new TextView(getActivity());
 
-        String messageText;
-        if (message.getUId().equals(uid)) messageText = "You:-\n" + message.getMessage();
-        else messageText = message.getUserName() + ":-\n" + message.getMessage();
+        String messageText = message.getMessage();
+        ChatMessage.Type type;
+        if (message.getUId().equals(uid)) type = ChatMessage.Type.SENT;
+        else type = ChatMessage.Type.RECEIVED;
 
-        textView.setText(messageText);
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParams.setMargins(0, 0, 0, 0);
-        textView.setLayoutParams(layoutParams);
+        long date = message.getDate();
+        ChatMessage chatMessage = new ChatMessage(messageText, date, type);
+        binding.chatView.addMessage(chatMessage);
 
-        if (message.getUId().equals(uid))
-            textView.setBackgroundResource(R.drawable.rounder_corner_1);
-        else textView.setBackgroundResource(R.drawable.rounded_corner_2);
 
-        binding.messagesLayout.addView(textView);
-        binding.scrollView.fullScroll(View.FOCUS_DOWN);
     }
 
     @Override
@@ -144,5 +134,11 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
             loadMessages();
             dataManager.queryForNewMessage();
         }
+    }
+
+    @Override
+    public boolean sendMessage(ChatMessage chatMessage) {
+        prepSendMessage(chatMessage);
+        return true;
     }
 }

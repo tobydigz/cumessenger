@@ -4,29 +4,29 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_profile"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@drawable/ic_face_black_48dp"
             android:title="Profile"/>
         <item
             android:id="@+id/nav_messaging"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@drawable/ic_message_white_24dp"
             android:title="Messages"/>
         <item
             android:id="@+id/nav_forum"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@drawable/ic_dashboard_black_24dp"
             android:title="Forums"/>
         <item
             android:id="@+id/nav_people"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@drawable/ic_person_black_24dp"
             android:title="People"/>
 
         <item
             android:id="@+id/nav_courses"
-            android:icon="@drawable/ic_menu_manage"
+            android:icon="@drawable/ic_book_black_24dp"
             android:title="Manage Courses"/>
 
         <item
             android:id="@+id/nav_timetable"
-            android:icon="@drawable/ic_dashboard_black_24dp"
+            android:icon="@drawable/ic_schedule_black_24dp"
             android:title="Timetable"/>
     </group>
 
@@ -34,7 +34,7 @@
         <menu>
             <item
                 android:id="@+id/nav_signout"
-                android:icon="@drawable/ic_menu_send"
+                android:icon="@drawable/ic_exit_to_app_black_24dp"
                 android:title="Signout"/>
         </menu>
     </item>

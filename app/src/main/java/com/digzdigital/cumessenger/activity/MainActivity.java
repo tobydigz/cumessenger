@@ -200,8 +200,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return EditFragment.newInstance(user);
     }
 
-    private Fragment createChatFragment( String chatWithUserid, String uid) {
-        return ChatFragment.newInstance(firebaseUser.getEmail(), chatWithUserid, uid);
+    private Fragment createChatFragment( String chatWithUserid, String uid, String email) {
+        return ChatFragment.newInstance(firebaseUser.getEmail(), chatWithUserid, uid, email);
     }
     private Fragment createTimeTableFragment() {
         return TimetableFragment.newInstance("", "");
@@ -291,13 +291,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
-    public void onUserClicked(String username) {
-        switchFragment(createChatFragment(username, firebaseUser.getUid()));
+    public void onUserClicked(String username, String email) {
+        switchFragment(createChatFragment(username, firebaseUser.getUid(), email));
     }
 
     @Override
     public void onOngoingMessageClicked(OngoingMessage ongoingMessage) {
-        createChatFragment(ongoingMessage.getChatWithUserId(), firebaseUser.getUid());
+        createChatFragment(ongoingMessage.getChatWithUserId(), firebaseUser.getUid(), ongoingMessage.getChatWithUserName());
     }
 
     public DataManager getDataManager() {

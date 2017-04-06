@@ -36,7 +36,7 @@ public class OngoingMessagesListAdapter extends RecyclerView.Adapter<OngoingMess
     public void onBindViewHolder(ViewHolder holder, final int position) {
         OngoingMessage ongoingMessage = getItem(position);
 
-        holder.textField.setText("Chat with" + ongoingMessage.getChatWithUserId());
+        holder.textField.setText("Chat with" + ongoingMessage.getChatWithUserName());
     }
 
     @Override
